@@ -5,16 +5,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Contact Tracing Application</title>
-    <!-- Bootstrap CSS (via CDN) -->
+
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Content goes here -->
-    <div class="container">
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-dark">
+        <h4 class="navbar-brand text-light">Hoos Sick</h4>
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+              <a class="nav-link text-light" href="{% url 'App:index' %}">Home</a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+                <a class = "nav-link text-light ml-auto" href="{% url 'App:help' %}">Help</a>
+            </li>
+            <li class="nav-item active">
+                <a class = "nav-link text-light ml-auto" href="{% url 'App:settings' %}">Settings</a>
+            </li>
+            <li class="nav-item active">
+                <a class = "nav-link text-light ml-auto" href="{% url 'App:logout' %}">Log out</a>
+            </li>
+            <li class="nav-item active">
+                <a class = "nav-link text-light ml-auto" href="{% url 'App:profile' %}">Profile</a>
+            </li>
+        </ul>
+    </nav>
         {% block content %}
 
         {% endblock %}
-    </div>
+    <div class="p-5 bg-white" ></div>
+    <footer class="text-center text-white p-1 pt-3 mt-3 fixed-bottom bg-dark">
+        <h6>This project is not live and created as part of HooHacks (2025)</h6>
+        <p>Created by Gavin Crigger, Matthew Lucio, Justin Park, and Sebastian Wiktorowicz</p>
+    </footer>
 
     <!-- Bootstrap JS (via CDN) -->
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
