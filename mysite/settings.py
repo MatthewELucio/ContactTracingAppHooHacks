@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-!+cgc*3@r)xh=kaqznl2*7inof1wi-1dus3m9*$4x6+#qrd=!p"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG') == 'True'
 
 ALLOWED_HOSTS = ['contact-tracing-app-hoo-hacks-ebbcf0aff9f8.herokuapp.com',
                  'hoossick.tech'
