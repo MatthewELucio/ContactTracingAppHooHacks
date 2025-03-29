@@ -1,25 +1,35 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 
 # Create your views here.
 def index(request):
-    return render(request, "index.html")
+    if request.user.is_authenticated:
+        return render(request, "index.html")
+    else: return render(request, "login.html")
 
 def login(request):
     return render(request, "login.html")
 
-def logout(request):
-    return render(request, "logout.html")
+def logout_view(request):
+    logout(request)
+    return login(request)
 
-@login_required
 def home(request):
-    return render(request, "home.html", {'email': request.user.email}) 
+    if request.user.is_authenticated:
+        return render(request, "home.html", {'email': request.user.email}) 
+    else: return render(request, "login.html")
 
 def help(request):
     return render(request, "help.html")
+    
 
 def profile(request):
-    return render(request, "profile.html")
+    if request.user.is_authenticated:
+        return render(request, "profile.html")
+    else: return render(request, "login.html")
 
 def settings(request):
-    return render(request, "settings.html")
+    if request.user.is_authenticated:
+        return render(request, "settings.html")
+    else: return render(request, "login.html")
