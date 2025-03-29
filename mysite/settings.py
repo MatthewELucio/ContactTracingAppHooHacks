@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-!+cgc*3@r)xh=kaqznl2*7inof1wi-1dus3m9*$4x6+#qrd=!p"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
+DEBUG = True
 
 ALLOWED_HOSTS = ['contact-tracing-app-hoo-hacks-ebbcf0aff9f8.herokuapp.com',
                  'localhost',
@@ -80,23 +80,16 @@ WSGI_APPLICATION = "mysite.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DEBUG = os.getenv('DEBUG')
-password = os.getenv('DATABASE_PASSWORD')
+# DEBUG = os.getenv('DEBUG')
+# password = os.getenv('DATABASE_PASSWORD')
 
-if DEBUG:
-    # Production: Use PostgreSQL (or any database specified by DATABASE_URL)
+if 'DATABASE_URL' in os.environ:
     DATABASES = {
-        'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'd9s5vjo6dea9tl',
-        'USER': 'uvm8f4jg50257',
-        'PASSWORD': password,
-        'HOST': 'c3cj4hehegopde.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com',
-        'PORT': '5432',
-        # 'TEST': {
-        #     'MIRROR': 'default',
-        # },
-    }
+        'default': dj_database_url.config(
+            default=os.environ['DATABASE_URL'],
+            # conn_max_age=600,  # persistent connections
+            ssl_require=True   # Enforce SSL if required (Heroku Postgres usually does)
+        )
     }
 else:
     # Testing/Local Development: Use SQLite
