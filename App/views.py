@@ -42,7 +42,40 @@ def update_location(request):
     
     now = timezone.now()
     RADIUS_THRESHOLD = 50         # in meters (adjust as needed)
-    TIME_THRESHOLD = 30 * 60 
+    TIME_THRESHOLD = 30 * 60
+
+    latest_relevant = RelevantLocation.objects.filter(user=request.user).order_by('-end_time').first()
+
+    if latest_relevant:
+        # Compute distance from the new location to the relevant location's stored coordinates.
+        distance = haversine(latest_relevant.latitude, latest_relevant.longitude, latitude, longitude)
+        if distance <= RADIUS_THRESHOLD:
+            # If within the threshold, update the end_time.
+            latest_relevant.end_time = now
+            latest_relevant.save()
+        else:
+            # If outside the threshold, check if the duration meets the time threshold.
+            duration = (latest_relevant.end_time - latest_relevant.start_time).total_seconds()
+            if duration < TIME_THRESHOLD:
+                # If not enough time has passed, you may choose to discard it.
+                latest_relevant.delete()
+            # In either case, start a new relevant location record.
+            RelevantLocation.objects.create(
+                user=request.user,
+                latitude=latitude,
+                longitude=longitude,
+                start_time=now,
+                end_time=now
+            )
+    else:
+        # No relevant location exists; create one.
+        RelevantLocation.objects.create(
+            user=request.user,
+            latitude=latitude,
+            longitude=longitude,
+            start_time=now,
+            end_time=now
+        )
     
     return JsonResponse({
         'status': 'success',
