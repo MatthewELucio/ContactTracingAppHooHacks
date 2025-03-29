@@ -1,5 +1,33 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<p>You are at LOGIN</p>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8"/>
+        <meta http-equiv="x-ua-compatible" content="IE=edge"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>Django Google Sign-In</title>
+        
+        <!-- Link to your custom stylesheet -->
+        <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    </head>
+
+    <body>
+        <header>
+            <div class="top-banner"></div>
+            <div class="bottom-banner">
+                <h1 class="title">Log-In Page</h1>
+            </div>
+        </header>
+        <div class = "main-picture">
+            <div class="overlay"></div>
+                <div class="content">
+                    {% load socialaccount %}
+                    <h2>Google Login</h2>
+                    <a href="{% provider_login_url 'google' %}?next=/home">Log in with google</a>
+                </div>
+        </div>
+    </body>
+</html>
 {% endblock %}
