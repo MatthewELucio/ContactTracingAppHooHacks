@@ -80,12 +80,23 @@ WSGI_APPLICATION = "mysite.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASE_URL = os.environ.get('DATABASE_URL')
+PROD = os.environ.get('PROD')
+password = os.environ.get('DATABASE_PASSWORD')
 
-if DATABASE_URL:
+if PROD:
     # Production: Use PostgreSQL (or any database specified by DATABASE_URL)
     DATABASES = {
-        'default': dj_database_url.config(default=DATABASE_URL)
+        'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'd9s5vjo6dea9tl',
+        'USER': 'uvm8f4jg50257',
+        'PASSWORD': password,
+        'HOST': 'c3cj4hehegopde.cluster-czrs8kj4isg7.us-east-1.rds.amazonaws.com',
+        'PORT': '5432',
+        # 'TEST': {
+        #     'MIRROR': 'default',
+        # },
+    }
     }
 else:
     # Testing/Local Development: Use SQLite
