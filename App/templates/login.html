@@ -1,8 +1,8 @@
-{% extends 'base.html' %}
 {% load static %}
 {% block content %}
 <!DOCTYPE html>
 <html lang="en">
+<link rel="stylesheet" href="{% static 'style.css' %}">
     <head>
         <meta charset="UTF-8"/>
         <meta http-equiv="x-ua-compatible" content="IE=edge"/>
@@ -10,7 +10,7 @@
         <title>Django Google Sign-In</title>
         
         <!-- Link to your custom stylesheet -->
-        <link rel="stylesheet" href="{% static 'css/login.css' %}">
+        <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet">
     </head>
 
     <body>
@@ -28,6 +28,16 @@
                     <a href="{% provider_login_url 'google' %}?next=/home">Log in with google</a>
                 </div>
         </div>
+        <div class="p-5 bg-white" ></div>
+        <footer class="text-center text-white p-1 pt-3 mt-3 fixed-bottom bg-dark">
+            <h6>This project is not live and created as part of HooHacks (2025)</h6>
+            <p>Created by Gavin Crigger, Matthew Lucio, Justin Park, and Sebastian Wiktorowicz</p>
+        </footer>
+    
+        <!-- Bootstrap JS (via CDN) -->
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
     </body>
-</html>
+    </html>
 {% endblock %}
