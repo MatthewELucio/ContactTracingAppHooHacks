@@ -80,8 +80,8 @@ WSGI_APPLICATION = "mysite.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DEBUG = os.environ.get('DEBUG')
-password = os.environ.get('DATABASE_PASSWORD')
+DEBUG = os.getenv('DEBUG')
+password = os.getenv('DATABASE_PASSWORD')
 
 if DEBUG:
     # Production: Use PostgreSQL (or any database specified by DATABASE_URL)
