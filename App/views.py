@@ -35,5 +35,6 @@ def settings(request):
 
 @login_required
 def home(request):
-    return render(request, "home.html", {'email': request.user.email}) 
+    if request.user.is_authenticated:
+        return render(request, "home.html", {'email': request.user.email}) 
     else: return render(request, "login.html")
