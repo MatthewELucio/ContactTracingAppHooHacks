@@ -20,27 +20,27 @@ class Disease(models.Model):
     def __str__(self):
         return self.name
     
-class User(AbstractUser):
-    # Here, each user is linked to an infection record (e.g., their current infection).
-    # If you expect multiple infections per user, consider moving this FK to the Infection model.
-    first_name = models.CharField(max_length=30, blank=True, help_text="User's first name")
-    last_name = models.CharField(max_length=30, blank=True, help_text="User's last name")
-    phone_number = models.CharField(max_length=15, blank=True, help_text="User's phone number")
-    email = models.EmailField(unique=True, help_text="User's email address")
-    date_of_birth = models.DateField(null=True, blank=True, help_text="User's date of birth")
-    address = models.TextField(blank=True, help_text="User's address")
-    is_verified = models.BooleanField(default=False, help_text="Indicates if the user's account is verified")
+# class User(AbstractUser):
+#     # Here, each user is linked to an infection record (e.g., their current infection).
+#     # If you expect multiple infections per user, consider moving this FK to the Infection model.
+#     first_name = models.CharField(max_length=30, blank=True, help_text="User's first name")
+#     last_name = models.CharField(max_length=30, blank=True, help_text="User's last name")
+#     phone_number = models.CharField(max_length=15, blank=True, help_text="User's phone number")
+#     email = models.EmailField(unique=True, help_text="User's email address")
+#     date_of_birth = models.DateField(null=True, blank=True, help_text="User's date of birth")
+#     address = models.TextField(blank=True, help_text="User's address")
+#     is_verified = models.BooleanField(default=False, help_text="Indicates if the user's account is verified")
 
-    def __str__(self):
-        return f"{self.first_name} {self.last_name} ({self.username})"
+#     def __str__(self):
+#         return f"{self.first_name} {self.last_name} ({self.username})"
 
 class Infection(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='infections',
-        help_text="The user who is infected"
-    )
+    # user = models.ForeignKey(
+    #     User,
+    #     on_delete=models.CASCADE,
+    #     related_name='infections',
+    #     help_text="The user who is infected"
+    # )
     disease = models.ForeignKey(
         Disease,
         on_delete=models.CASCADE,
@@ -53,11 +53,11 @@ class Infection(models.Model):
         return f"Infection of {self.user.username} with {self.disease.name} at {self.infected_at}"
     
 class LocationHistory(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='location_histories'
-    )
+    # user = models.ForeignKey(
+    #     User,
+    #     on_delete=models.CASCADE,
+    #     related_name='location_histories'
+    # )
     latitude = models.FloatField()
     longitude = models.FloatField()
     # Timestamp to record when the location was saved.
@@ -71,11 +71,11 @@ class LocationHistory(models.Model):
 
 
 class RelevantLocation(models.Model):
-    user = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='relevant_locations'
-    )
+    # user = models.ForeignKey(
+    #     User,
+    #     on_delete=models.CASCADE,
+    #     related_name='relevant_locations'
+    # )
     latitude = models.FloatField()
     longitude = models.FloatField()
     # Start and end times representing the period during which the user stayed within a certain radius.
