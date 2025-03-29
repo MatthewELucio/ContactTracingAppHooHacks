@@ -75,7 +75,7 @@ function updateUserLocation() {
 // When the page loads, immediately get the user's location and then call updateUserLocation every 10 seconds.
 window.onload = function() {
     updateUserLocation();
-    setInterval(updateUserLocation, 10000);
+    setInterval(updateUserLocation, 100000);
 };
 </script>
 {% endblock %}

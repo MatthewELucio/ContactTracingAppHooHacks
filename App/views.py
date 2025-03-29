@@ -2,10 +2,24 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 import json
+import math
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from .models import LocationHistory
+from .models import LocationHistory, RelevantLocation
+import django.utils.timezone as timezone
+
+
+def haversine(lat1, lon1, lat2, lon2):
+    """Calculate the great circle distance in meters between two points on Earth."""
+    R = 6371000  # Radius of Earth in meters
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    delta_phi = math.radians(lat2 - lat1)
+    delta_lambda = math.radians(lon2 - lon1)
+    a = math.sin(delta_phi/2)**2 + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda/2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return R * c
 
 
 @csrf_exempt
@@ -25,6 +39,10 @@ def update_location(request):
         latitude=latitude,
         longitude=longitude
     )
+    
+    now = timezone.now()
+    RADIUS_THRESHOLD = 50         # in meters (adjust as needed)
+    TIME_THRESHOLD = 30 * 60 
     
     return JsonResponse({
         'status': 'success',
