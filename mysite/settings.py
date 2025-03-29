@@ -29,7 +29,8 @@ SECRET_KEY = "django-insecure-!+cgc*3@r)xh=kaqznl2*7inof1wi-1dus3m9*$4x6+#qrd=!p
 DEBUG = os.getenv('DEBUG') == 'True'
 
 ALLOWED_HOSTS = ['contact-tracing-app-hoo-hacks-ebbcf0aff9f8.herokuapp.com',
-                 'hoossick.tech'
+                 'hoossick.tech',
+                 'www.hoossick.tech',
                  'localhost',
                  '127.0.0.1']
 
