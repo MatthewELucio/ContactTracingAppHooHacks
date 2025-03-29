@@ -92,7 +92,23 @@ def update_location(request):
 
 def index(request):
     if request.user.is_authenticated:
-        return render(request, "index.html")
+        notifications = None #update once we have data structure in models
+        return render(request, "index.html", {'Notifications':notifications})
+    else: return render(request, "login.html")
+
+def report_illness(request):
+    if request.user.is_authenticated:
+        return render(request, "report.html")
+    else: return render(request, "login.html")
+
+def learn(request):
+    if request.user.is_authenticated:
+        return render(request, "learn.html")
+    else: return render(request, "login.html")
+
+def notify(request):
+    if request.user.is_authenticated:
+        return render(request, "notify.html")
     else: return render(request, "login.html")
 
 def login(request):
@@ -109,7 +125,7 @@ def home(request):
 
 def help(request):
     return render(request, "help.html")
-    
+
 
 def profile(request):
     if request.user.is_authenticated:
