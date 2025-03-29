@@ -3,6 +3,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 from .models import LocationHistory
 
 # Create your views here.
@@ -32,6 +34,9 @@ def update_location(request):
     })
 
 def index(request):
+    if request.user.is_authenticated:
+        return render(request, "index.html")
+    else: return render(request, "login.html")
     # latest_location = LocationHistory.objects.filter(user=request.user).order_by('-recorded_at').first()
     # return render(request, 'index.html', {'latest_location': latest_location})
     return render(request, 'index.html')
@@ -39,3 +44,30 @@ def index(request):
 
 def login(request):
     return render(request, "login.html")
+
+def logout_view(request):
+    logout(request)
+    return login(request)
+
+def home(request):
+    if request.user.is_authenticated:
+        return render(request, "home.html", {'email': request.user.email}) 
+    else: return render(request, "login.html")
+
+def help(request):
+    return render(request, "help.html")
+    
+
+def profile(request):
+    if request.user.is_authenticated:
+        return render(request, "profile.html")
+    else: return render(request, "login.html")
+
+def settings(request):
+    if request.user.is_authenticated:
+        return render(request, "settings.html")
+
+@login_required
+def home(request):
+    return render(request, "home.html", {'email': request.user.email}) 
+    else: return render(request, "login.html")
