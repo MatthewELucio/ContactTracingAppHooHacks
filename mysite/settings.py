@@ -156,12 +156,18 @@ AUTHENTICATION_BACKENDS = [
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
+load_dotenv()
+
+client_id = os.getenv('GOOGLE_CLIENT_ID')
+secret = os.getenv('GOOGLE_CLIENT_SECRET')
+key = os.getenv('SECRET_KEY')
+
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id' : "",
-            'secret' : "",
-            'key' : ''
+            'client_id' : client_id,
+            'secret' : secret,
+            'key' : key
         },       
         'SCOPE': [
             'profile',
