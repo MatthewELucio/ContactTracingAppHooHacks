@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+from django.conf import settings
 
 class Disease(models.Model):
     AIR = 'air'
@@ -35,12 +36,13 @@ class Disease(models.Model):
 #         return f"{self.first_name} {self.last_name} ({self.username})"
 
 class Infection(models.Model):
-    # user = models.ForeignKey(
-    #     User,
-    #     on_delete=models.CASCADE,
-    #     related_name='infections',
-    #     help_text="The user who is infected"
-    # )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='infections',
+        null = True,
+        help_text="The user who is infected"
+    )
     disease = models.ForeignKey(
         Disease,
         on_delete=models.CASCADE,
@@ -53,11 +55,12 @@ class Infection(models.Model):
         return f"Infection of {self.user.username} with {self.disease.name} at {self.infected_at}"
     
 class LocationHistory(models.Model):
-    # user = models.ForeignKey(
-    #     User,
-    #     on_delete=models.CASCADE,
-    #     related_name='location_histories'
-    # )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null = True,
+        related_name='location_histories'
+    )
     latitude = models.FloatField()
     longitude = models.FloatField()
     # Timestamp to record when the location was saved.
@@ -71,11 +74,12 @@ class LocationHistory(models.Model):
 
 
 class RelevantLocation(models.Model):
-    # user = models.ForeignKey(
-    #     User,
-    #     on_delete=models.CASCADE,
-    #     related_name='relevant_locations'
-    # )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null = True,
+        related_name='relevant_locations'
+    )
     latitude = models.FloatField()
     longitude = models.FloatField()
     # Start and end times representing the period during which the user stayed within a certain radius.
