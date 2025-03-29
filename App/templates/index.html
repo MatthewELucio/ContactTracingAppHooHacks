@@ -1,5 +1,81 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<p>You are at INDEX</p>
+<div id="location-display">
+    <p>Recording your location...</p>
+</div>
+
+<script>
+// Helper function to get the CSRF token from cookies.
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Function to send the geolocation data to the update_location view.
+function sendLocation(position) {
+    const data = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
+    };
+
+    fetch('/update-location/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Location update response:', data);
+        if (data.status === 'success') {
+            document.getElementById('location-display').innerHTML = `
+                <p>Latest recorded location:</p>
+                <p>
+                    Latitude: ${data.latitude}<br>
+                    Longitude: ${data.longitude}<br>
+                    Recorded at: ${data.recorded_at}
+                </p>
+            `;
+        } else {
+            document.getElementById('location-display').innerHTML = `<p>Error recording location.</p>`;
+        }
+    })
+    .catch(error => {
+        console.error('Error updating location:', error);
+        document.getElementById('location-display').innerHTML = `<p>Error recording location.</p>`;
+    });
+}
+
+// Function to get the current geolocation and call sendLocation.
+function updateUserLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(sendLocation, function(error) {
+            console.error("Error obtaining geolocation:", error);
+            document.getElementById('location-display').innerHTML = `<p>Error obtaining location.</p>`;
+        });
+    } else {
+        console.error("Geolocation is not supported by this browser.");
+        document.getElementById('location-display').innerHTML = `<p>Geolocation not supported by this browser.</p>`;
+    }
+}
+
+// When the page loads, immediately get the user's location and then call updateUserLocation every 10 seconds.
+window.onload = function() {
+    updateUserLocation();
+    setInterval(updateUserLocation, 10000);
+};
+</script>
 {% endblock %}
