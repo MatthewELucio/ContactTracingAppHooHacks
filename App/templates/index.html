@@ -1,5 +1,42 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<p>You are at INDEX</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Geolocation</title>
+</head>
+<body>
+    <h1>Geolocation Test</h1>
+    <div id="location-display">
+        <p>Waiting for location...</p>
+    </div>
+
+    <script>
+        // Function to update the page with the user's location.
+        function showLocation(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            document.getElementById('location-display').innerHTML = `
+                <p>Latitude: ${lat}</p>
+                <p>Longitude: ${lon}</p>
+            `;
+        }
+
+        // Error handler if location access fails.
+        function locationError(error) {
+            console.error('Error obtaining geolocation:', error);
+            document.getElementById('location-display').innerHTML = `<p>Error obtaining location.</p>`;
+        }
+
+        // Check if geolocation is available and get current position.
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showLocation, locationError);
+        } else {
+            document.getElementById('location-display').innerHTML = `<p>Geolocation is not supported by your browser.</p>`;
+        }
+    </script>
+</body>
+</html>
 {% endblock %}
