@@ -1,1 +1,1 @@
-web: gunicorn contact-tracing-app-hoo-hacks.wsgi --log-file -
+web: gunicorn ContactTracingAppHooHacks.wsgi --log-file -
