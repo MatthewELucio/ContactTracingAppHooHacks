@@ -1,42 +1,78 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Test Geolocation</title>
-</head>
-<body>
-    <h1>Geolocation Test</h1>
-    <div id="location-display">
-        <p>Waiting for location...</p>
-    </div>
+<div id="location-display">
+    <p>Recording your location...</p>
+</div>
 
-    <script>
-        // Function to update the page with the user's location.
-        function showLocation(position) {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
+<script>
+// Helper function to get the CSRF token from cookies.
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+// Function to send the geolocation data to the update_location view.
+function sendLocation(position) {
+    const data = {
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
+    };
+
+    fetch('/update-location/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Location update response:', data);
+        if (data.status === 'success') {
             document.getElementById('location-display').innerHTML = `
-                <p>Latitude: ${lat}</p>
-                <p>Longitude: ${lon}</p>
+                <p>Latest recorded location:</p>
+                <p>
+                    Latitude: ${data.latitude}<br>
+                    Longitude: ${data.longitude}<br>
+                    Recorded at: ${data.recorded_at}
+                </p>
             `;
-        }
-
-        // Error handler if location access fails.
-        function locationError(error) {
-            console.error('Error obtaining geolocation:', error);
-            document.getElementById('location-display').innerHTML = `<p>Error obtaining location.</p>`;
-        }
-
-        // Check if geolocation is available and get current position.
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(showLocation, locationError);
         } else {
-            document.getElementById('location-display').innerHTML = `<p>Geolocation is not supported by your browser.</p>`;
+            document.getElementById('location-display').innerHTML = `<p>Error recording location.</p>`;
         }
-    </script>
-</body>
-</html>
+    })
+    .catch(error => {
+        console.error('Error updating location:', error);
+        document.getElementById('location-display').innerHTML = `<p>Error recording location.</p>`;
+    });
+}
+
+// Function to get the current geolocation and call sendLocation.
+function updateUserLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(sendLocation, function(error) {
+            console.error("Error obtaining geolocation:", error);
+            document.getElementById('location-display').innerHTML = `<p>Error obtaining location.</p>`;
+        });
+    } else {
+        console.error("Geolocation is not supported by this browser.");
+        document.getElementById('location-display').innerHTML = `<p>Geolocation not supported by this browser.</p>`;
+    }
+}
+
+// When the page loads, get the user's location and send it to the server.
+window.onload = updateUserLocation;
+</script>
 {% endblock %}
