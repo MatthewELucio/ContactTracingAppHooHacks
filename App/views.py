@@ -1,3 +1,4 @@
+from datetime import timedelta
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
@@ -22,7 +23,7 @@ def haversine(lat1, lon1, lat2, lon2):
     return R * c
 
 
-@csrf_exempt
+@csrf_exempt  # For demonstration only; ensure proper CSRF handling in production.
 @require_POST
 @login_required
 def update_location(request):
@@ -33,49 +34,54 @@ def update_location(request):
     except (KeyError, json.JSONDecodeError):
         return JsonResponse({'status': 'error', 'message': 'Invalid data'}, status=400)
     
-    # Create a new location history record, associating it with the logged-in user.
+    # Always record the location history.
     location_entry = LocationHistory.objects.create(
-        user=request.user,  # Ensure that the user field is uncommented in your model.
+        user=request.user,
         latitude=latitude,
         longitude=longitude
     )
     
     now = timezone.now()
-    RADIUS_THRESHOLD = 50         # in meters (adjust as needed)
-    TIME_THRESHOLD = 30 * 60
+    TIME_THRESHOLD = 20 * 60  # 30 minutes in seconds
+    window_start = now - timedelta(seconds=TIME_THRESHOLD)
+    RADIUS_THRESHOLD = 50  # in meters
 
-    latest_relevant = RelevantLocation.objects.filter(user=request.user).order_by('-end_time').first()
+    # Retrieve all location entries in the last 30 minutes.
+    recent_entries = LocationHistory.objects.filter(
+        user=request.user,
+        recorded_at__gte=window_start
+    ).order_by('recorded_at')
 
-    if latest_relevant:
-        # Compute distance from the new location to the relevant location's stored coordinates.
-        distance = haversine(latest_relevant.latitude, latest_relevant.longitude, latitude, longitude)
-        if distance <= RADIUS_THRESHOLD:
-            # If within the threshold, update the end_time.
-            latest_relevant.end_time = now
-            latest_relevant.save()
-        else:
-            # If outside the threshold, check if the duration meets the time threshold.
-            duration = (latest_relevant.end_time - latest_relevant.start_time).total_seconds()
-            if duration < TIME_THRESHOLD:
-                # If not enough time has passed, you may choose to discard it.
-                latest_relevant.delete()
-            # In either case, start a new relevant location record.
-            RelevantLocation.objects.create(
+    if recent_entries.exists():
+        # Use the first entry as the reference point.
+        ref = recent_entries.first()
+        all_within_radius = True
+        for entry in recent_entries:
+            distance = haversine(ref.latitude, ref.longitude, entry.latitude, entry.longitude)
+            if distance > RADIUS_THRESHOLD:
+                all_within_radius = False
+                break
+
+        if all_within_radius:
+            # The user has been within the radius for at least 30 minutes.
+            # Check if a RelevantLocation record already exists for this period.
+            relevant = RelevantLocation.objects.filter(
                 user=request.user,
-                latitude=latitude,
-                longitude=longitude,
-                start_time=now,
-                end_time=now
-            )
-    else:
-        # No relevant location exists; create one.
-        RelevantLocation.objects.create(
-            user=request.user,
-            latitude=latitude,
-            longitude=longitude,
-            start_time=now,
-            end_time=now
-        )
+                start_time__gte=window_start
+            ).order_by('start_time').first()
+            if relevant:
+                # Update its end_time to now.
+                relevant.end_time = now
+                relevant.save()
+            else:
+                # Create a new RelevantLocation record.
+                RelevantLocation.objects.create(
+                    user=request.user,
+                    latitude=ref.latitude,
+                    longitude=ref.longitude,
+                    start_time=recent_entries.first().recorded_at,
+                    end_time=now
+                )
     
     return JsonResponse({
         'status': 'success',
