@@ -129,7 +129,7 @@ class Notification(models.Model):
     disease = models.ForeignKey(
         Disease,
         on_delete=models.CASCADE,
-        related_name='infections',
+        related_name='notifications',
         help_text="The disease associated with this notification"
     )
     message = models.TextField()
