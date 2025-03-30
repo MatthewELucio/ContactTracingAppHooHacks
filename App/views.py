@@ -109,6 +109,18 @@ def finalize_location(request):
             return JsonResponse({'status': 'kept', 'message': 'Relevant location retained'})
     return JsonResponse({'status': 'none', 'message': 'No pending relevant location found'})
 
+def archive_notification(request):
+    if request.user.is_authenticated:
+        notifications = None #update once we have data structure in models
+        return render(request, "index.html", {'Notifications':notifications})
+    else: return render(request, "login.html")
+
+def view_notification(request):
+    if request.user.is_authenticated:
+        notifications = None #update once we have data structure in models
+        return render(request, "index.html", {'Notifications':notifications})
+    else: return render(request, "login.html")
+
 def index(request):
     if request.user.is_authenticated:
         notifications = None #update once we have data structure in models

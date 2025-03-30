@@ -15,11 +15,14 @@
                     {% if Notifications %}
                         {% for notification in Notifications %}
                             <tr>
-                                <td> {{ notification.date }}</td>
-                                <td> {{ notification.illness }}</td>
-                                <td> {{ notification.viewed}}</td>
+                                <td> {{ notification.created_at }}</td>
+                                <td> {{ notification.disease }}</td>
+                                <td> {{ notification.read }}</td>
                                 <td>
                                     <a class="btn btn-outline-primary" href="{% url 'App:view_notification' notification_number=notification.pk %}">View</a>
+                                </td>
+                                <td>
+                                    <a class="btn btn-outline-primary" href="{% url 'App:archive_notification' notification_number=notification.pk %}">Archive</a>
                                 </td>
                             </tr>
                         {% endfor %}
