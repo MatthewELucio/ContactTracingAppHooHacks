@@ -357,7 +357,11 @@ def archive_notif(request, notif):
         notification = NotificationV2.objects.get(id=pk)
         notification.archived = True
         notification.save()
-        return render(request, "index.html") 
+        notifications = NotificationV2.objects.filter(user=request.user).order_by('-created_at').filter(archived=False)
+        print(f"User {request.user} has {notifications} notifications.")
+        print(f"Notifications for {request.user.username}: {notifications.count()}")
+        print(f'')
+        return render(request, "index.html", {'Notifications':notifications})
     else: return render(request, "login.html")
 
 
