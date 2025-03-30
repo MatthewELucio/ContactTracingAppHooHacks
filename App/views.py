@@ -221,7 +221,7 @@ def report_physical_illness(request):
         last_names = request.POST.getlist("last_name[]")
         
         google_accounts = SocialAccount.objects.filter(provider='google')
-        print(f"Google accounts: {google_accounts}")
+        # print(f"Google accounts: {google_accounts}")
         
         names = []
         for first, last in zip(first_names, last_names):
@@ -468,6 +468,36 @@ def diagnose(request):
         return render(request, "learn.html", context)
     else:
         return render(request, "learn.html", context)
+    
+from django.core.mail import send_mail
+from django.conf import settings
+
+def create_notification_and_send_email(user, disease, message):
+    # Create the notification (assuming Notification is your model)
+    notification = NotificationV2.objects.create(
+        user=user,
+        disease=disease,  # Should be a Disease instance
+        message=message,
+    )
+    notification.save()
+
+    # Construct the email content
+    subject = f"Exposure Notification for {disease}"
+    email_message = f"Dear {user.username},\n\n{message}\n\nStay safe!"
+    recipient_list = [user.email]
+    
+    # Send the email (make sure EMAIL settings are properly configured in settings.py)
+    send_mail(
+        subject,
+        email_message,
+        settings.DEFAULT_FROM_EMAIL,
+        recipient_list,
+        fail_silently=False,
+    )
+
+    return notification
+
+    
 # def condition_search(request):
 #     """
 #     This view queries the external Medical Conditions API and renders the learn.html page.
