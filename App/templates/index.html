@@ -113,9 +113,16 @@ window.onload = function() {
             <div class="sidebar-box p-4 border rounded">
                 <h4>Dashboard</h4>
                 <container class="d-flex flex-column m-3 justify-content-center">
-                    <button class="btn btn-secondary mt-2">
-                        <a class="text-white" href="{% url 'App:report_illness' %}">Report illness</a>
-                    </button>
+                    <div class = "dropdown width:100%">
+                        <button class="btn width:100% btn-secondary dropdown-toggle mt-2" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <a class="text-white">Report illness</a>
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="{% url 'App:report_illness'%}?type=physical">Physical Illness</a>
+                            <a class="dropdown-item" href="{% url 'App:report_illness'%}?type=airborne">Airborne Illness</a>
+                            <a class="dropdown-item" href="{% url 'App:learn' %}">Not sure?</a>
+                          </div>
+                    </div>
                     <button class="btn btn-secondary mt-2">
                         <a class="text-white" href="{% url 'App:notify' %}">Notify user</a>
                     </button>

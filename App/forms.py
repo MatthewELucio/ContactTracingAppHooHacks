@@ -14,13 +14,13 @@ class PhysicalReportForm(forms.ModelForm):
 
      symptoms_appeared_date = forms.DateTimeField(
         widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-        label="Start Time"
+        label="When did your symptoms start?"
     )
     
      diagnosis_date = forms.DateTimeField(
         required=False,
         widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-        label="End Time"
+        label="When were you diagnosed?"
     )
 
      symptoms = forms.CharField(
@@ -29,7 +29,7 @@ class PhysicalReportForm(forms.ModelForm):
     )
 
      illness = forms.ChoiceField(
-        choices=[
+        choices=[ #todo: populate from table
             ('mono', 'Mono'),
             ('hfm', 'Hand-Foot-Mouth Disease'),
             ('other', 'Other')
