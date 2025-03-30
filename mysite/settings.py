@@ -93,21 +93,21 @@ WSGI_APPLICATION = "mysite.wsgi.application"
 # DEBUG = os.getenv('DEBUG')
 # password = os.getenv('DATABASE_PASSWORD')
 database_url = os.getenv('DATABASE_URL')
-# if 'DATABASE_URL' in os.environ:
-DATABASES = {
-    'default': dj_database_url.config(
-        default=database_url,
-        ssl_require=True   # Enforce SSL if required (Heroku Postgres usually does)
-    )
-}
-# else:
-#     # Testing/Local Development: Use SQLite
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': BASE_DIR / 'db.sqlite3',
-#         }
-#     }
+if 'DATABASE_URL' in os.environ:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=database_url,
+            ssl_require=True   # Enforce SSL if required (Heroku Postgres usually does)
+        )
+    }
+else:
+    # Testing/Local Development: Use SQLite
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

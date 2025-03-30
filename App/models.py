@@ -116,3 +116,20 @@ class PhysicalReport(models.Model):
 
     def __str__(self):
         return self.name
+
+class AirborneReport(models.Model):
+    symptoms = models.CharField(max_length=255)
+    symptoms_appeared_date = models.DateTimeField()
+    diagnosis_date = models.DateTimeField(null=True, blank=True)
+    illness = models.CharField(
+        max_length=100,
+        choices=[
+            ('cc', 'Commonn Cold'),
+            ('flu', 'Influenza (Flu)'),
+            ('other', 'Other')
+        ]
+    )
+    was_diagnosed = models.BooleanField(default=False)  # Checkbox
+
+    def __str__(self):
+        return self.symptoms

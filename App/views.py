@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from .models import LocationHistory, RelevantLocation, Disease
 import django.utils.timezone as timezone
-from .forms import PhysicalReportForm
+from .forms import PhysicalReportForm, AirborneReportForm
 
 
 def haversine(lat1, lon1, lat2, lon2):
@@ -97,25 +97,35 @@ def index(request):
         return render(request, "index.html", {'Notifications':notifications})
     else: return render(request, "login.html")
 
-def report_illness(request):
-    if request.user.is_authenticated:
-        if request.method == 'POST':
-            form = PhysicalReportForm(request.POST)
-            if form.is_valid():
-                form.save()  # Save the data to the database
-                return redirect('index')  # Redirect to a success page or another view
-        else:
-            type = request.GET.get('type', 'physical')
-            if type == 'physical':
-                form = PhysicalReportForm()
-            elif type == 'airborne':
-                #form = AirborneReportFrom()
-                form = PhysicalReportForm()
-            else:
-                return render(request, 'index.html', {'error': 'form'})
-        
-        return render(request, 'report.html', {'form': form})
-    else: return render(request, "login.html")
+def report_physical_illness(request):
+    if not request.user.is_authenticated:
+        return render(request, "login.html")
+
+    if request.method == 'POST':
+        form = PhysicalReportForm(request.POST)
+        if form.is_valid():
+            form.save()  # Save the data to the database
+            return render(request, 'index.html', {'message': 'successful physical form'})
+    else:
+        form = PhysicalReportForm()
+
+    return render(request, 'report_physical.html', {'form': form})
+
+def report_airborne_illness(request):
+    if not request.user.is_authenticated:
+        return render(request, "login.html")
+
+    if request.method == 'POST':
+        form = AirborneReportForm(request.POST)
+        if form.is_valid():
+            form.save() 
+
+            
+            return render(request, 'index.html', {'message': 'successful airborne form!'})  # Redirect to index or another page after success
+    else:
+        form = AirborneReportForm()
+
+    return render(request, 'report_airborne.html', {'form': form})
 
 def learn(request):
     if request.user.is_authenticated:

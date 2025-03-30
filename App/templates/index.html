@@ -101,6 +101,13 @@ window.onload = function() {
                     <div class = "p-4 alert-primary d-flex justify-content-center">
                         <tr>
                             <td>No notifications at the moment.</td>
+                            <!-- {% if messages %}
+                                <td>
+                                    {% for message in messages %}
+                                        {{ message }}
+                                    {% endfor %}
+                                </td>
+                            {% endif %} -->
                         </tr>
                     </div>
                     {% endif %}
@@ -118,8 +125,8 @@ window.onload = function() {
                             <a class="text-white">Report illness</a>
                         </button>
                         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" href="{% url 'App:report_illness'%}?type=physical">Physical Illness</a>
-                            <a class="dropdown-item" href="{% url 'App:report_illness'%}?type=airborne">Airborne Illness</a>
+                            <a class="dropdown-item" href="{% url 'App:report_physical_illness' %}">Report Physical Illness</a>
+                            <a class="dropdown-item" href="{% url 'App:report_airborne_illness' %}">Report Airborne Illness</a>
                             <a class="dropdown-item" href="{% url 'App:learn' %}">Not sure?</a>
                           </div>
                     </div>
