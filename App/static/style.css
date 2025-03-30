@@ -22,6 +22,12 @@
         content: url('home_dark.png');
     }
 
+    @media (max-width: 768px) {
+        .nav-link span {
+            display: none;
+        }
+    }
+
     .navimg2:hover img {
         content: url('settings_dark.png');
     }
