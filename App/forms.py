@@ -1,23 +1,26 @@
 from django import forms
-from .models import PhysicalReport, AirborneReport, Disease
+from .models import PhysicalReport2, AirborneReport, Disease
 from django.forms import DateTimeInput
 
-class PhysicalReportForm(forms.ModelForm):
+class PhysicalReportForm2(forms.ModelForm):
     class Meta:
-        model = PhysicalReport
-        fields = ['disease', 'was_diagnosed']
+        model = PhysicalReport2
+        fields = ['disease']
 
     disease = forms.ChoiceField(
         choices=Disease.objects.values_list('name', 'name'),
         label = "Disease"
     )
     
-    was_diagnosed = forms.BooleanField(
-        # required=True,
-        label="Diagnosed?",
-        initial=False
-    )
-     
+    # was_diagnosed = forms.BooleanField(
+    #     # required=True,
+    #     label="Diagnosed?",
+    #     initial=False
+    # )
+    
+class NameForm(forms.Form):
+    first_name = forms.CharField(max_length=50, label="First Name")
+    last_name = forms.CharField(max_length=50, label="Last Name")
 
 class AirborneReportForm(forms.ModelForm):
     class Meta:
