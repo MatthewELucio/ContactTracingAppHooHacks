@@ -55,7 +55,7 @@ class NotificationV2(models.Model):
     read = models.BooleanField(default=False)
     archived = models.BooleanField(default=False)
 
-    def str(self):
+    def __str__(self):
         return f"Notification for {self.user.username} at {self.created_at} - Read: {self.read}"
 
 class Infection(models.Model):

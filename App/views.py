@@ -112,7 +112,10 @@ def finalize_location(request):
 
 def index(request):
     if request.user.is_authenticated:
-        notifications = None #update once we have data structure in models
+        notifications = NotificationV2.objects.filter(user=request.user).order_by('-created_at')
+        print(f"User {request.user} has {notifications} notifications.")
+        print(f"Notifications for {request.user.username}: {notifications.count()}")
+        print(f'')
         return render(request, "index.html", {'Notifications':notifications})
     else: return render(request, "login.html")
 
@@ -239,8 +242,8 @@ def profile(request):
 
     return render(request, 'profile.html', {'form': form})
 
-@login_required
-def home(request):
-    if request.user.is_authenticated:
-        return render(request, "home.html", {'email': request.user.email}) 
-    else: return render(request, "login.html")
+# @login_required
+# def home(request):
+#     if request.user.is_authenticated:
+#         return render(request, "home.html", {'email': request.user.email}) 
+#     else: return render(request, "login.html")
