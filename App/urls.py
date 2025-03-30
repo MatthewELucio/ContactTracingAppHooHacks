@@ -31,7 +31,8 @@ urlpatterns = [
     path("profile/", views.profile, name='profile'),
     path("home/", views.home, name='home'),
     path("accounts/", include("allauth.urls")),
-    path("report_illness/", views.report_illness, name='report_illness'),
+    path('report_physical_illness/', views.report_physical_illness, name='report_physical_illness'),
+    path('report_airborne_illness/', views.report_airborne_illness, name='report_airborne_illness'),
     path("notify/", views.notify, name='notify'),
     path("learn/", views.learn, name='learn')
 ]

@@ -44,8 +44,8 @@
                             <a class="text-white">Report illness</a>
                         </button>
                         <div class="dropdown-menu" style ="width:100%" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" href="{% url 'App:report_illness'%}?type=physical">Physical Illness</a>
-                            <a class="dropdown-item" href="{% url 'App:report_illness'%}?type=airborne">Airborne Illness</a>
+                            <a class="dropdown-item" href="{% url 'App:report_physical_illness'%}">Physical Illness</a>
+                            <a class="dropdown-item" href="{% url 'App:report_airborne_illness'%}">Airborne Illness</a>
                             <a class="dropdown-item" href="{% url 'App:learn' %}">Not sure?</a>
                           </div>
                     </div>
