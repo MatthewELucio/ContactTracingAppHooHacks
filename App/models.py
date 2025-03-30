@@ -121,7 +121,7 @@ from django.db import models
 from django.conf import settings
 
 class PhysicalReport(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null = True, related_name='physical_reports')
     illness = models.CharField(max_length=100)
     # other fields as needed
 
@@ -139,7 +139,8 @@ class Notification(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
-        related_name='notifications'
+        related_name='notifications',
+        null = True
     )
     disease = models.ForeignKey(
         Disease,
