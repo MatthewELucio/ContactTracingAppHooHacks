@@ -31,8 +31,12 @@ urlpatterns = [
     path("profile/", views.profile, name='profile'),
     path("home/", views.home, name='home'),
     path("accounts/", include("allauth.urls")),
+    path('diagnose/', views.diagnose, name='diagnose'),
     path('report_physical_illness/', views.report_physical_illness, name='report_physical_illness'),
     path('report_airborne_illness/', views.report_airborne_illness, name='report_airborne_illness'),
     path("archive/", views.archive, name='archive'),
-    path("learn/", views.learn, name='learn')
+    path("learn/", views.learn, name='learn'),
+    path("view_notification/", views.view_notification, name ='view_notification'),
+    path("archive_notification/", views.archive_notification, name ='archive_notification'),
+    path("admin_visualization/", views.admin_visualization_view, name='admin_visualization_view')
 ]

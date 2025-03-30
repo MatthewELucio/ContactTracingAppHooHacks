@@ -9,3 +9,42 @@
         height: 100%;  
         width: 100%;   
     }
+
+    .navclass {
+        background-color: #FFFFFF;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        height: 50px;
+        width: auto;
+      }
+    
+
+    .navimg1:hover img {
+        content: url('home_dark.png');
+    }
+
+    .navimg2:hover img {
+        content: url('settings_dark.png');
+    }
+
+    .navimg3:hover img {
+        content: url('logout_dark.png'); 
+    }
+
+    .navimg4:hover img {
+        content: url('help_dark.png'); 
+    }
+
+    .navimage {
+        width: 40px;
+        height: auto;
+      }
+
+    .logoimage {
+        width: 130px;
+        height: auto;
+      }  
+      
+    .navclass:hover {
+        opacity: 0.7;  /* Fade to 50% opacity */
+        transform: scale(1.1);  
+    }

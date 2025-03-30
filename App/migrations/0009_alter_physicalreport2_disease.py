@@ -11,8 +11,14 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name='physicalreport2',
-            name='disease',
-            field=models.CharField(choices=[('Mononucleosis (Mono)', 'Mononucleosis (Mono)'), ('HIV & AIDS', 'HIV & AIDS')], max_length=100),
+            model_name="physicalreport2",
+            name="disease",
+            field=models.CharField(
+                choices=[
+                    ("Mononucleosis (Mono)", "Mononucleosis (Mono)"),
+                    ("HIV & AIDS", "HIV & AIDS"),
+                ],
+                max_length=100,
+            ),
         ),
     ]
