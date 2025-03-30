@@ -365,6 +365,8 @@ def diagnose(request):
 
     if request.method == "POST":
         diseases = Disease.objects.all()
+        # Build a comma-separated string of valid disease names.
+        valid_diseases = ", ".join([d.name for d in diseases])
         symptoms = request.POST.get("symptoms", "").strip()
         if not symptoms:
             context["error"] = "Please enter your symptoms."
@@ -373,6 +375,7 @@ def diagnose(request):
         # Build the prompt for ChatGPT.
         prompt = (
             f"Based on the following symptoms, provide the most likely diagnosis and any recommended next steps. "
+            f"Only choose from the following valid diseases: {valid_diseases}. "
             "Please include a disclaimer that you are not a doctor and that this is not medical advice.\n\nSymptoms: "
             f"{symptoms}"
         )
