@@ -14,17 +14,19 @@
                 <tbody class="p-3">
                     {% if Notifications %}
                         {% for notification in Notifications %}
-                            <tr>
-                                <td> {{ notification.created_at }}</td>
-                                <td> {{ notification.disease }}</td>
-                                <td> {{ notification.read }}</td>
-                                <td>
-                                    <a class="btn btn-outline-primary" href="{% url 'App:view_notification' notification_number=notification.pk %}">View</a>
-                                </td>
-                                <td>
-                                    <a class="btn btn-outline-primary" href="{% url 'App:archive_notification' notification_number=notification.pk %}">Archive</a>
-                                </td>
-                            </tr>
+                            {% if not notification.archived %}
+                                <tr>
+                                    <td> {{ notification.created_at }}</td>
+                                    <td> {{ notification.disease }}</td>
+                                    <td> {{ notification.read }}</td>
+                                    <td>
+                                        <a class="btn btn-outline-primary" href="{% url 'App:view_notification' notification_number=notification.pk %}">View</a>
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-outline-primary" href="{% url 'App:archive_notification' notification_number=notification.pk %}">Archive</a>
+                                    </td>
+                                </tr>
+                            {% endif %}
                         {% endfor %}
                     {% else %}
                     <div class = "p-4 alert-primary d-flex justify-content-center">
