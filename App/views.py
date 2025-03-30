@@ -209,7 +209,7 @@ def view_notification(request):
 
 def index(request):
     if request.user.is_authenticated:
-        notifications = NotificationV2.objects.filter(user=request.user).order_by('-created_at')
+        notifications = NotificationV2.objects.filter(user=request.user).order_by('-created_at').filter(archived=False)
         return render(request, "index.html", {'Notifications':notifications})
     else: return render(request, "login.html")
     
@@ -347,6 +347,16 @@ def home(request):
     if request.user.is_authenticated:
         return render(request, "home.html", {'email': request.user.email}) 
     else: return render(request, "login.html")
+
+def archive_notif(request, notif):
+    if request.user.is_authenticated:
+        pk = notif
+        notification = NotificationV2.objects.get(id=pk)
+        notification.archived = True
+        notification.save()
+        return render(request, "index.html") 
+    else: return render(request, "login.html")
+
 
 
 @require_http_methods(["GET", "POST"])

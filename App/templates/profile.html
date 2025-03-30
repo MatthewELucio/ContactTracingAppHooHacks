@@ -27,10 +27,10 @@
                 <form method="POST">
                     {% csrf_token %}
                     <p class="pt-2">
-                        First name: <input type="text" name="first_name" value="{{ user.first_name }}">
+                        First name:  {{ user.first_name }}
                     </p>
                     <p class="pt-1">
-                        Last name: <input type="text" name="last_name" value="{{ user.last_name }}">
+                        Last name:   {{ user.last_name }}
                     </p>
                     <p class="pt-1">
                         Email: <input class="align-right" type="email" name="email" value="{{ user.email }}">

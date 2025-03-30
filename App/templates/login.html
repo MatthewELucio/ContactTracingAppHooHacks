@@ -7,7 +7,7 @@
         <meta charset="UTF-8"/>
         <meta http-equiv="x-ua-compatible" content="IE=edge"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title>Django Google Sign-In</title>
+        <title>Log In</title>
         
         <!-- Link to your custom stylesheet -->
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet">
@@ -16,18 +16,19 @@
     <body class="text-center">
         <header>
             <nav class="navbar navbar-expand-lg navbar-light bg-dark">
-                <h4 class="navbar-brand text-light">Hoos Sick</h4>
+                <img src="{% static 'logo.png' %}" class="img-fluid logoimage" alt="Responsive image">
             </nav>
             <div class="top-banner"></div>
             <div class="bottom-banner">
-                <h1 class="title p-5">Welcome to Hoos Sick!</h1>
+                <img src="{% static 'sniffles.png' %}" class="img-fluid sniffle fade-in pt-3" alt="Responsive image">
             </div>
         </header>
         <div class = "main-picture">
             <div class="overlay"></div>
                 <div class="content">
                     {% load socialaccount %}
-                    <h2 class = "p-2">Sign up or in:</h2>
+                    <h2 class = "slide-from-left pt-5">Welcome to Hoos Sick,<h2>
+                        <h6 class="slide-from-right pb-3">where we let you know you're sick before your body does</h6>
                     <button type="button" class="btn btn-primary">
                         <a class = "text-white" href="{% provider_login_url 'google' %}?next=/">Log in with google</a>
                     </button>
@@ -43,6 +44,14 @@
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
+
+        <script>
+            window.onload = function () {
+              document.querySelector('.sniffle').classList.add('fade-in-active');
+              document.querySelector('.slide-from-left').classList.add('slide-from-left-active');
+              document.querySelector('.slide-from-right').classList.add('slide-from-right-active');
+            };
+        </script>
     </body>
     </html>
 {% endblock %}

@@ -19,7 +19,6 @@
                                 <th scope="col">Date</th>
                                 <th scope="col">Disease</th>
                                 <th scope="col">Notes</th>
-                                <th scope="col">View</th>
                                 <th scope="col">Archive</th>
                             </tr>
                         </thead>
@@ -29,11 +28,8 @@
                                     <td> {{ notification.created_at }}</td>
                                     <td> {{ notification.disease }}</td>
                                     <td> {{ notification.message }}</td>
-                                     <td>
-                                        <button class="btn btn-outline-primary" href="#">View</button>
-                                    </td>
                                     <td>
-                                        <button class="btn btn-outline-primary" href="#">Archive</button>
+                                        <button class="btn btn-outline-primary""><a href="{% url 'App:archive_notif' notif=notification.id %}">Archive</a></button>
                                     </td>
                                 </tr>
                             {% endif %}
