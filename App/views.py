@@ -195,9 +195,6 @@ def finalize_location(request):
 def archive_notification(request):
     if request.user.is_authenticated:
         notifications = NotificationV2.objects.filter(user=request.user).order_by('-created_at')
-        print(f"User {request.user} has {notifications} notifications.")
-        print(f"Notifications for {request.user.username}: {notifications.count()}")
-        print(f'')
         return render(request, "index.html", {'Notifications':notifications})
     else: return render(request, "login.html")
 
@@ -233,7 +230,6 @@ def report_physical_illness(request):
                 for account in google_accounts:
                     if account.user.first_name.lower() == first.strip().lower() and account.user.last_name.lower() == last.strip().lower():
                         # Perform the necessary action with the matched user
-                        print(f"Matched user: {account.user.username}")
                         disease_instance = Disease.objects.filter(name=disease).first()
                         notif = NotificationV2.objects.create(
                             user=account.user,
@@ -407,7 +403,6 @@ def diagnose(request):
         context["symptoms"] = symptoms
         context["diagnosis"] = diagnosis
         context["Diseases"] = diseases  # Pass the list of diseases to the template for reference
-
     # Render learn.html with the current context.
     return render(request, "learn.html", context)
 # def condition_search(request):

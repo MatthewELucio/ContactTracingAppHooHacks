@@ -158,4 +158,4 @@ class AirborneReport3(models.Model):
     was_diagnosed = models.BooleanField(default=False)  # Checkbox
 
     def __str__(self):
-        return self.symptoms
+        return self.disease.name
