@@ -4,7 +4,7 @@
 
 <div class="container mt-5">
     <div class="row d-flex justify-content-end p-4">
-        <h3 class="">Hello, {{user.username}}.</h3>
+        <h3>Hello, {{ user.username }}.</h3>
     </div>
     <div class="row">
         <div class="col-lg-8 col-md-7">
@@ -22,20 +22,30 @@
                                 <th scope="col">Archive</th>
                             </tr>
                         </thead>
-                        {% for notification in Notifications %}
-                            {% if not notification.archived %}
-                                <tr>
-                                    <td> {{ notification.disease }}</td>
-                                    <td> {{ notification.created_at }}</td>
-                                    <td> {{ notification.message }}</td>
-                                    <td>
-                                        <button class="btn btn-outline-primary""><a href="{% url 'App:archive_notif' notif=notification.id %}">Archive</a></button>
-                                    </td>
-                                </tr>
-                            {% endif %}
-                        {% endfor %}
+                        <tbody>
+                            {% for notification in Notifications %}
+                                {% if not notification.archived %}
+                                    <tr style="
+                                        {% if notification.notif_strength == 'low' %}
+                                            background: linear-gradient(90deg, rgba(255, 255, 0, 0.4), rgba(255, 255, 0, 0.2));
+                                        {% elif notification.notif_strength == 'medium' %}
+                                            background: linear-gradient(90deg, rgba(255, 165, 0, 0.4), rgba(255, 165, 0, 0.2));
+                                        {% elif notification.notif_strength == 'high' %}
+                                            background: linear-gradient(90deg, rgba(255, 0, 0, 0.4), rgba(255, 0, 0, 0.2));
+                                        {% endif %}
+                                    ">
+                                        <td>{{ notification.created_at }}</td>
+                                        <td>{{ notification.disease }}</td>
+                                        <td>{{ notification.message }}</td>
+                                        <td>
+                                            <button class="btn btn-outline-primary"><a href="{% url 'App:archive_notif' notif=notification.id %}">Archive</a></button>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
                     {% else %}
-                    <div class = "p-4 alert-primary d-flex justify-content-center">
+                    <div class="p-4 alert-primary d-flex justify-content-center">
                         <tr>
                             <td>No notifications at the moment.</td>
                         </tr>
@@ -49,23 +59,23 @@
         <div class="col-lg-4 col-md-5">
             <div class="sidebar-box p-4 border rounded">
                 <h4>Dashboard</h4>
-                <container class="d-flex flex-column m-3 justify-content-center">
-                    <div class = "dropdown width:100%">
-                        <button class="btn width:100% btn-secondary dropdown-toggle mt-2" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style ="width:100%">
-                            <a class="text-white">Report illness</a>
+                <div class="d-flex flex-column m-3 justify-content-center">
+                    <div class="dropdown" style="width:100%;">
+                        <button class="btn btn-secondary dropdown-toggle mt-2" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="width:100%;">
+                            Report illness
                         </button>
-                        <div class="dropdown-menu" style ="width:100%" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" href="{% url 'App:report_physical_illness'%}">Physical Illness</a>
-                            <a class="dropdown-item" href="{% url 'App:report_airborne_illness'%}">Airborne Illness</a>
-                          </div>
+                        <div class="dropdown-menu" style="width:100%;" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="{% url 'App:report_physical_illness' %}">Physical Illness</a>
+                            <a class="dropdown-item" href="{% url 'App:report_airborne_illness' %}">Airborne Illness</a>
+                        </div>
                     </div>
                     <button class="btn btn-secondary mt-2">
                         <a class="text-white" href="{% url 'App:archive' %}">Archive</a>
                     </button>
                     <button class="btn btn-secondary mt-2">
-                        <a class="text-white" href="{% url 'App:learn' %}">Learn more</a>
+                        <a class="text-white" href="{% url 'App:learn' %}">Learn more about your symptoms</a>
                     </button>
-                </container>
+                </div>
             </div>
         </div>
     </div>
