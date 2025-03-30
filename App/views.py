@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import logout
 from django.contrib.auth.models import Group
 import math, datetime, json, folium, os
-from folium.plugins import HeatMap
+from folium.plugins import HeatMap, TimestampedGeoJson
 from datetime import datetime
 from django.conf import settings
 from django.http import JsonResponse
@@ -31,20 +31,14 @@ def is_site_admin(user):
 
 @user_passes_test(is_site_admin, login_url='/login')
 def admin_visualization_view(request):
+    location_entries = LocationHistory.objects.all()
     user_locations = [
-        ("admin", 38.0315141, -78.5106534, datetime(2025, 3, 29, 10, 0)),
-        ("throwaway", 38.031536, -78.5105206, datetime(2025, 3, 29, 10, 30)),
-        ("justin0", 38.0362287, -78.5071464, datetime(2025, 3, 29, 11, 0)),
+        (entry.user, entry.latitude, entry.longitude, entry.recorded_at) for entry in location_entries
     ]
-    print("Generating exposure map...")  # Debugging step
 
-    # Define the path to save the map in the static folder
     map_filename = "exposure_map.html"
     map_path = os.path.join(settings.BASE_DIR, 'static', map_filename)
 
-    # Ensure the static folder exists, if not, create it
-
-    # Generate and save the map
     generate_exposure_map(user_locations, save_path=map_path)
 
     return render(request, "admin_visualization.html", {"map_path": f"/static/{map_filename}"})
@@ -56,21 +50,19 @@ def generate_exposure_map(user_locations, radius=50, save_path=None):
     
     print(f"Generating map for {len(user_locations)} locations...")
 
-    # Determine the map center
     first_location = user_locations[0]
     map_center = (first_location[1], first_location[2])
 
     # Initialize the map
     exposure_map = folium.Map(location=map_center, zoom_start=15, control_scale=True)
 
-    # Add circles for each location with infection radius
     for username, lat, lon, timestamp in user_locations:
         popup_text = f"{username} - {timestamp.strftime('%Y-%m-%d %H:%M:%S')}"
-        print(f"Adding circle for {username} at ({lat}, {lon})")
+        # print(f"Adding circle for {username} at ({lat}, {lon})")
 
         folium.Circle(
             location=(lat, lon),
-            radius=radius,  # Infection radius in meters
+            radius=radius,
             color="red",
             fill=True,
             fill_color="red",
@@ -78,7 +70,6 @@ def generate_exposure_map(user_locations, radius=50, save_path=None):
             popup=popup_text
         ).add_to(exposure_map)
 
-        # Add a marker at the center of each exposure zone
         folium.Marker(
             location=(lat, lon),
             popup=popup_text,
@@ -87,13 +78,11 @@ def generate_exposure_map(user_locations, radius=50, save_path=None):
 
     # Add a heatmap layer for better visualization
     heatmap_data = [(lat, lon) for _, lat, lon, _ in user_locations]
-    print(f"Adding heatmap with {len(heatmap_data)} data points.")
 
     HeatMap(heatmap_data, radius=30).add_to(exposure_map)
 
     # Save map to file if path is provided
     if save_path:
-        print(f"Saving map to {save_path}")
         exposure_map.save(save_path)
 
     return exposure_map
