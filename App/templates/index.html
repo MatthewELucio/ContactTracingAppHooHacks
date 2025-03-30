@@ -27,11 +27,11 @@
                                 {% if not notification.archived %}
                                     <tr style="
                                         {% if notification.notif_strength == 'low' %}
-                                            background-color: yellow;
+                                            background-color: rgba(255, 255, 0, 0.4);
                                         {% elif notification.notif_strength == 'medium' %}
-                                            background-color: orange;
+                                            background-color: rgba(255, 165, 0, 0.4);
                                         {% elif notification.notif_strength == 'high' %}
-                                            background-color: red;
+                                            background-color: rgba(255, 0, 0, 0.4);
                                         {% endif %}
                                     ">
                                         <td>{{ notification.created_at }}</td>
