@@ -7,9 +7,10 @@ import math
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from .models import LocationHistory, RelevantLocation, Disease
+from .models import LocationHistory, RelevantLocation, Disease, NotificationV2
 import django.utils.timezone as timezone
-from .forms import PhysicalReportForm, ProfileForm
+from .forms import PhysicalReportForm2, AirborneReportForm, ProfileForm
+from allauth.socialaccount.models import SocialAccount
 import requests
 from django.conf import settings
 from django.views.decorators.http import require_GET
@@ -17,7 +18,7 @@ from openai import OpenAI
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
 import os
-from .forms import PhysicalReportForm, AirborneReportForm, ProfileForm
+
 
 def haversine(lat1, lon1, lat2, lon2):
     """Calculate the great circle distance in meters between two points on Earth."""
@@ -127,12 +128,35 @@ def report_physical_illness(request):
         return render(request, "login.html")
 
     if request.method == 'POST':
-        form = PhysicalReportForm(request.POST)
+        disease = request.POST.get("disease")
+        
+        first_names = request.POST.getlist("first_name[]")
+        last_names = request.POST.getlist("last_name[]")
+        
+        google_accounts = SocialAccount.objects.filter(provider='google')
+        
+        names = []
+        for first, last in zip(first_names, last_names):
+            if first.strip() and last.strip():
+                names.append({"first_name": first, "last_name": last})
+                for account in google_accounts:
+                    if account.user.first_name.lower() == first.strip().lower() and account.user.last_name.lower() == last.strip().lower():
+                        # Perform the necessary action with the matched user
+                        disease_instance = Disease.objects.filter(name=disease).first()
+                        notif = NotificationV2.objects.create(
+                            user=account.user,
+                            disease=disease_instance,
+                            message=f"You have been exposed to {disease}",
+                            created_at=timezone.now()
+                        )
+                        notif.save()
+                            
+        form = PhysicalReportForm2(request.POST)
         if form.is_valid():
             form.save()
             return render(request, 'index.html', {'message': 'successful physical form'})
     else:
-        form = PhysicalReportForm()
+        form = PhysicalReportForm2()
 
     return render(request, 'report_physical.html', {'form': form})
 
