@@ -182,11 +182,6 @@ def learn(request):
         return render(request, "learn.html", {'Diseases': diseases})
     else: return render(request, "login.html")
 
-def notify(request):
-    if request.user.is_authenticated:
-        return render(request, "notify.html")
-    else: return render(request, "login.html")
-
 def login(request):
     return render(request, "login.html")
 
@@ -202,6 +197,11 @@ def home(request):
 def help(request):
     return render(request, "help.html")
 
+def archive(request):
+    if request.user.is_authenticated:
+        notifications = None
+        return render(request, "archive.html", {'Notifications': notifications}) 
+    else: return render(request, "login.html")
 
 def profile(request):
     user = request.user  # Get the current user

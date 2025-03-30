@@ -33,6 +33,6 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path('report_physical_illness/', views.report_physical_illness, name='report_physical_illness'),
     path('report_airborne_illness/', views.report_airborne_illness, name='report_airborne_illness'),
-    path("notify/", views.notify, name='notify'),
+    path("archive/", views.archive, name='archive'),
     path("learn/", views.learn, name='learn')
 ]
