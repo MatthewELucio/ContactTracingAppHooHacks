@@ -100,22 +100,14 @@ class RelevantLocation(models.Model):
     # examines LocationHistory records and creates RelevantLocation entries accordingly.
 
 class PhysicalReport(models.Model):
-    name = models.CharField(max_length=255)
-    symptoms_appeared_date = models.DateTimeField()
-    diagnosis_date = models.DateTimeField(null=True, blank=True)
-    symptoms = models.TextField()
-    illness = models.CharField(
+    disease = models.CharField(
         max_length=100,
-        choices=[
-            ('mono', 'Mono'),
-            ('hfm', 'Hand-Foot-Mouth Disease'),
-            ('other', 'Other')
-        ]
+        choices=Disease.objects.values_list('name', 'name'),
     )
     was_diagnosed = models.BooleanField(default=False)  # Checkbox
 
     def __str__(self):
-        return self.name
+        return self.disease
 
 class AirborneReport(models.Model):
     symptoms = models.CharField(max_length=255)
