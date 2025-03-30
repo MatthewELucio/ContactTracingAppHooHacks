@@ -24,15 +24,15 @@ app_name = 'App'
 urlpatterns = [
     path("", views.index, name='index'),
     path('update-location/', views.update_location, name='update_location'),
+    path("finalize-location/", views.finalize_location, name="finalize_location"),
     path("login/", views.login, name='login'),
     path("logout/", views.logout_view, name='logout'),
-    path("settings/", views.settings, name='settings'),
     path("help/", views.help, name='help'),
     path("profile/", views.profile, name='profile'),
     path("home/", views.home, name='home'),
     path("accounts/", include("allauth.urls")),
     path('report_physical_illness/', views.report_physical_illness, name='report_physical_illness'),
     path('report_airborne_illness/', views.report_airborne_illness, name='report_airborne_illness'),
-    path("notify/", views.notify, name='notify'),
+    path("archive/", views.archive, name='archive'),
     path("learn/", views.learn, name='learn')
 ]
