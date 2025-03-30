@@ -92,11 +92,11 @@ WSGI_APPLICATION = "mysite.wsgi.application"
 
 # DEBUG = os.getenv('DEBUG')
 # password = os.getenv('DATABASE_PASSWORD')
-
+database_url = os.getenv('DATABASE_URL')
 # if 'DATABASE_URL' in os.environ:
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.environ['DATABASE_URL'],
+        default=database_url,
         ssl_require=True   # Enforce SSL if required (Heroku Postgres usually does)
     )
 }
