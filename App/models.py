@@ -72,7 +72,6 @@ class LocationHistory(models.Model):
     # Note: To clear these records every 24 hours, you might use a scheduled task or management command
     # that deletes LocationHistory objects older than 24 hours.
 
-
 class RelevantLocation(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -98,3 +97,21 @@ class RelevantLocation(models.Model):
     # Note: The filtering to determine if a user is within a certain radius for more than 30 minutes
     # should be implemented in your application logic (e.g., as a query or a scheduled process) that
     # examines LocationHistory records and creates RelevantLocation entries accordingly.
+
+class PhysicalReport(models.Model):
+    name = models.CharField(max_length=255)
+    symptoms_appeared_date = models.DateTimeField()
+    diagnosis_date = models.DateTimeField(null=True, blank=True)
+    symptoms = models.TextField()
+    illness = models.CharField(
+        max_length=100,
+        choices=[
+            ('mono', 'Mono'),
+            ('hfm', 'Hand-Foot-Mouth Disease'),
+            ('other', 'Other')
+        ]
+    )
+    was_diagnosed = models.BooleanField(default=False)  # Checkbox
+
+    def __str__(self):
+        return self.name

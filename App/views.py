@@ -1,5 +1,5 @@
 from datetime import timedelta
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 import json
@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from .models import LocationHistory, RelevantLocation
 import django.utils.timezone as timezone
+from .forms import PhysicalReportForm
 
 
 def haversine(lat1, lon1, lat2, lon2):
@@ -98,7 +99,15 @@ def index(request):
 
 def report_illness(request):
     if request.user.is_authenticated:
-        return render(request, "report.html")
+        if request.method == 'POST':
+            form = PhysicalReportForm(request.POST)
+            if form.is_valid():
+                form.save()  # Save the data to the database
+                return redirect('index')  # Redirect to a success page or another view
+        else:
+            form = PhysicalReportForm()
+        
+        return render(request, 'report.html', {'form': form})
     else: return render(request, "login.html")
 
 def learn(request):
