@@ -221,7 +221,7 @@ def diagnose(request):
 
 
         try:
-            response = client.chat.completions.create(model="gpt-4o-ni",
+            response = client.chat.completions.create(model="gpt-4o-mini",
             messages=[
                 {
                     "role": "system",
