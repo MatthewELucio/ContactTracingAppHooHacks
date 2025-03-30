@@ -4,7 +4,8 @@
 
 <div class="container mt-5 content-box p-4 border rounded">
     <div>
-        <h4 class="alert-primary pt-2 pb-2 mb-2 border rounded px-2 w-50">View your archived notifications here.</h4>
+        <h2 class="pt-2 pb-2 mb-2 px-2 w-50">Archived notifications</h2>
+        <p>Take a look at any of your prior notifications here:</p>
     </div>
     {% if Notifications %}
         <table class="table table-bordered">
@@ -13,7 +14,6 @@
                     <th scope="col">Date</th>
                     <th scope="col">Disease</th>
                     <th scope="col">Notes</th>
-                    <th scope="col">Expand</th>
                 </tr>
             </thead>
             {% for notification in Notifications %}
@@ -21,9 +21,6 @@
                     <td> {{ notification.created_at }}</td>
                     <td> {{ notification.disease }}</td>
                     <td> {{ notification.message }}</td>
-                    <td>
-                        <button class="btn btn-outline-primary" href="#">View</button>
-                    </td>
                 </tr>
             {% endfor %}
         </table>
