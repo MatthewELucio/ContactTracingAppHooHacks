@@ -2,13 +2,34 @@
 {% load static %}
 {% block content %}
 
-<h1>Report physical illness</h1>
+<!-- templates/report_form.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Report Illness</title>
+    <!-- Include Bootstrap or other CSS if desired -->
+</head>
+<body>
+    <h1>Report Illness</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ report_form.as_p }}
+        
+        <h2>People Involved</h2>
+        {{ person_formset.management_form }}
+        {% for form in person_formset %}
+            <div class="person-form">
+                {{ form.as_p }}
+            </div>
+        {% endfor %}
+        
+        <button type="submit">Submit Report</button>
+    </form>
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
+    <!-- Optionally, add JavaScript to allow dynamic adding/removing of forms -->
+</body>
+</html>
 
-    <button type="submit">Submit</button>
-</form>
 
 {% endblock %}

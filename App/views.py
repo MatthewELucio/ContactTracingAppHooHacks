@@ -11,6 +11,11 @@ from .models import LocationHistory, RelevantLocation, Disease
 import django.utils.timezone as timezone
 from .forms import PhysicalReportForm
 
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import PhysicalReportForm, PersonForm, PersonFormSet
+from .models import ReportPerson
+
 
 def haversine(lat1, lon1, lat2, lon2):
     """Calculate the great circle distance in meters between two points on Earth."""
@@ -115,25 +120,67 @@ def index(request):
         return render(request, "index.html", {'Notifications':notifications})
     else: return render(request, "login.html")
 
-def report_illness(request):
-    if request.user.is_authenticated:
-        if request.method == 'POST':
-            form = PhysicalReportForm(request.POST)
-            if form.is_valid():
-                form.save()  # Save the data to the database
-                return redirect('index')  # Redirect to a success page or another view
-        else:
-            type = request.GET.get('type', 'physical')
-            if type == 'physical':
-                form = PhysicalReportForm()
-            elif type == 'airborne':
-                #form = AirborneReportFrom()
-                form = PhysicalReportForm()
-            else:
-                return render(request, 'index.html', {'error': 'form'})
+# def report_illness(request):
+#     if request.user.is_authenticated:
+#         if request.method == 'POST':
+#             form = PhysicalReportForm(request.POST)
+#             if form.is_valid():
+#                 form.save()  # Save the data to the database
+#                 return redirect('index')  # Redirect to a success page or another view
+#         else:
+#             type = request.GET.get('type', 'physical')
+#             if type == 'physical':
+#                 form = PhysicalReportForm()
+#             elif type == 'airborne':
+#                 #form = AirborneReportFrom()
+#                 form = PhysicalReportForm()
+#             else:
+#                 return render(request, 'index.html', {'error': 'form'})
         
-        return render(request, 'report.html', {'form': form})
-    else: return render(request, "login.html")
+#         return render(request, 'report.html', {'form': form})
+#     else: return render(request, "login.html")
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .forms import PhysicalReportForm, PersonForm, PersonFormSet
+from .models import ReportPerson
+from django.forms import formset_factory
+
+
+@login_required
+def report_illness(request):
+    # Create the formset class for Person forms
+    PersonFormSet = formset_factory(PersonForm, extra=1)
+    
+    if request.method == 'POST':
+        report_form = PhysicalReportForm(request.POST)
+        person_formset = PersonFormSet(request.POST, prefix='persons')
+        
+        if report_form.is_valid() and person_formset.is_valid():
+            # Save the report (assign the current user)
+            physical_report = report_form.save(commit=False)
+            physical_report.user = request.user
+            physical_report.save()
+            
+            # Process each form in the formset
+            for form in person_formset:
+                # Check if the form has data (skip empty forms)
+                if form.cleaned_data and (form.cleaned_data.get('first_name') or form.cleaned_data.get('last_name')):
+                    ReportPerson.objects.create(
+                        report=physical_report,
+                        first_name=form.cleaned_data['first_name'],
+                        last_name=form.cleaned_data['last_name']
+                    )
+            return redirect('index')  # or a success page
+    else:
+        report_form = PhysicalReportForm()
+        person_formset = PersonFormSet(prefix='persons')
+    
+    return render(request, 'report.html', {
+        'report_form': report_form,
+        'person_formset': person_formset,
+    })
+
 
 def learn(request):
     if request.user.is_authenticated:

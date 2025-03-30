@@ -1,44 +1,60 @@
+# from django import forms
+# from .models import PhysicalReport, Disease
+# from django.forms import DateTimeInput
+
+# # You can create this in your view (or import it from a separate module if preferred)
+# from django.forms import formset_factory
+
+# class PhysicalReportForm(forms.ModelForm):
+#     class Meta:
+#         model = PhysicalReport
+#         fields = ['illness', 'first_name', 'last_name']
+
+#     illness = forms.ChoiceField(
+#         # choices=[ #todo: populate from table
+#         #     ('mono', 'Mono'),
+#         #     ('hfm', 'Hand-Foot-Mouth Disease'),
+#         #     ('other', 'Other')
+#         # ],
+#         choices=Disease.objects.values_list('id', 'name'),
+#         label = "Disease"
+#     )
+    
+#     # users = forms.ModelChoiceField(
+#     first_name =forms.CharField(max_length=100),
+#     last_name =forms.CharField(max_length=100),
+        
+# class PersonForm(forms.Form):
+#     first_name = forms.CharField(max_length=100)
+#     last_name = forms.CharField(max_length=100)
+    
+# PersonFormSet = formset_factory(PersonForm, extra=1)  # starts with one empty form
+
+
 from django import forms
 from .models import PhysicalReport
-from django.forms import DateTimeInput
+from django.forms import formset_factory
+
 
 class PhysicalReportForm(forms.ModelForm):
-     class Meta:
+    # Populate the choices from the Disease model.
+    illness = forms.ChoiceField(
+        choices=[],  # We’ll populate this in __init__
+        label="Disease"
+    )
+    
+    class Meta:
         model = PhysicalReport
-        fields = ['name', 'symptoms_appeared_date', 'diagnosis_date', 'symptoms', 'illness', 'was_diagnosed']
-        
-     name = forms.CharField(
-        widget=forms.Textarea(attrs={'rows': 5, 'placeholder': 'Enter description here'}),
-        label="Symptoms?"
-    )
-
-     symptoms_appeared_date = forms.DateTimeField(
-        widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-        label="When did your symptoms start?"
-    )
+        fields = ['illness']
     
-     diagnosis_date = forms.DateTimeField(
-        required=False,
-        widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-        label="When were you diagnosed?"
-    )
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Populate choices from the Disease table.
+        from .models import Disease  # Import here to avoid circular imports if needed.
+        self.fields['illness'].choices = Disease.objects.values_list('id', 'name')
 
-     symptoms = forms.CharField(
-        widget=forms.Textarea(attrs={'rows': 5, 'placeholder': 'Enter description here'}),
-        label="Symptoms?"
-    )
+class PersonForm(forms.Form):
+    first_name = forms.CharField(max_length=100)
+    last_name = forms.CharField(max_length=100)
 
-     illness = forms.ChoiceField(
-        choices=[ #todo: populate from table
-            ('mono', 'Mono'),
-            ('hfm', 'Hand-Foot-Mouth Disease'),
-            ('other', 'Other')
-        ],
-        label = "Illness"
-    )
-    
-     was_diagnosed = forms.BooleanField(
-        required=True,
-        label="Diagnosed?",
-        initial=False
-    )
+PersonFormSet = formset_factory(PersonForm, extra=1)
