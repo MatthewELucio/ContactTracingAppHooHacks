@@ -7,7 +7,7 @@ import math
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from .models import LocationHistory, RelevantLocation
+from .models import LocationHistory, RelevantLocation, Disease
 import django.utils.timezone as timezone
 from .forms import PhysicalReportForm
 
@@ -128,7 +128,8 @@ def report_illness(request):
 
 def learn(request):
     if request.user.is_authenticated:
-        return render(request, "learn.html")
+        diseases = Disease.objects.all()
+        return render(request, "learn.html", {'diseases': diseases})
     else: return render(request, "login.html")
 
 def notify(request):
