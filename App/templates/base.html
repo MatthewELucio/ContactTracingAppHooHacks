@@ -11,27 +11,31 @@
 <body>
 
     <nav class="navbar navbar-expand-lg navbar-light bg-dark">
-        <li class="nav-brand active px-2 d-flex align-items-center">
+        <li class="nav-brand pb-1 pt-1 active pl-2 pr-4 d-flex align-items-center">
             <img src="{% static 'logo.png' %}" class="img-fluid logoimage" alt="Responsive image">
         </li>
         <ul class="navbar-nav">
-            <li class="nav-item navclass active px-2 d-flex align-items-center">
+            <li class="border rounded nav-item navimg1 navclass active px-1 d-flex align-items-center">
+                <a class="nav-link text-dark" href="{% url 'App:index' %}">
                 <img src="{% static 'home_light.png' %}" class="img-fluid navimage" alt="Responsive image">
-              <a class="nav-link text-light" href="{% url 'App:index' %}">Home</a>
+              <span>Home</a>
             </li>
         </ul>
         <ul class="navbar-nav ml-auto px-2">
-            <li class="nav-item navclass active px-2 d-flex align-items-center">
+            <li class="mx-2 border rounded nav-item navimg4 navclass active px-1 d-flex align-items-center">
+                <a class = "nav-link text-dark ml-auto" href="{% url 'App:help' %}">
                 <img src="{% static 'help_light.png' %}" class="img-fluid navimage" alt="Responsive image">
-                <a class = "nav-link text-light ml-auto" href="{% url 'App:help' %}">Help</a>
+                <span>Help</span></a>
             </li>
-            <li class="nav-item navclass active px-2 d-flex align-items-center">
+            <li class="mx-2 border rounded nav-item navimg3 navclass active px-1 d-flex align-items-center">
+                <a class = "nav-link text-dark ml-auto" href="{% url 'App:logout' %}">
                 <img src="{% static 'logout_light.png' %}" class="img-fluid navimage" alt="Responsive image">
-                <a class = "nav-link text-light ml-auto" href="{% url 'App:logout' %}">Log out</a>
+                <span>Log out</span></a>
             </li>
-            <li class="nav-item navclass active px-2 d-flex align-items-center">
+            <li class="mx-2 border rounded nav-item navimg2 navclass active px-1 d-flex align-items-center">
+                <a class = "nav-link text-dark ml-auto" href="{% url 'App:profile' %}">
                 <img src="{% static 'settings_light.png' %}" class="img-fluid navimage" alt="Responsive image">
-                <a class = "nav-link text-light ml-auto" href="{% url 'App:profile' %}">Profile</a>
+                <span>Profile</span></a>
             </li>
         </ul>
     </nav>
