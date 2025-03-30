@@ -32,8 +32,7 @@ urlpatterns = [
     path("home/", views.home, name='home'),
     path("accounts/", include("allauth.urls")),
     path("report_illness/", views.report_illness, name='report_illness'),
-    path('conditions/search/', views.condition_search, name='condition_search'),
-    path('conditions/autocomplete/', views.condition_autocomplete, name='condition_autocomplete'),
+    path('diagnose/', views.diagnose, name='diagnose'),
     path("notify/", views.notify, name='notify'),
     path("learn/", views.learn, name='learn')
 ]

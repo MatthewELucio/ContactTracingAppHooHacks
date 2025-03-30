@@ -32,7 +32,7 @@
       </table>
     </div>
     
-    <!-- Right column: Report Symptoms and Condition Search -->
+    <!-- Right column: Report Symptoms, Condition Search, and Diagnosis -->
     <div class="col-md-5">
       <!-- Report Symptoms Card -->
       <div class="card p-3 mb-3">
@@ -40,34 +40,26 @@
           <h2>Report symptoms</h2>
         </div>
         <p class="pt-3">Got any symptoms dragging you down? Let us know and we'll give recommendations on what it may be and how to help!</p>
-        <!-- You can add a button/link to the report form here if desired -->
+        <!-- You can add a link/button to the full report form if desired -->
       </div>
       
-      <!-- Condition Search Card -->
+      <!-- Diagnosis Card -->
       <div class="card p-3">
         <div class="card-header border-rounded">
-          <h2>Condition Search</h2>
+          <h2>Get Diagnosis</h2>
         </div>
-        <form method="get" action="{% url 'App:condition_search' %}">
+        <form method="post" action="{% url 'App:diagnose' %}">
+          {% csrf_token %}
           <div class="mb-3">
-            <label for="q" class="form-label">Search Medical Conditions:</label>
-            <input type="text" id="q" name="q" class="form-control" value="{{ query }}" placeholder="e.g., gastroenteritis">
+            <label for="symptoms" class="form-label">Enter your symptoms:</label>
+            <textarea id="symptoms" name="symptoms" class="form-control" rows="3" placeholder="e.g., fever, cough, headache"></textarea>
           </div>
-          <button type="submit" class="btn btn-primary">Search</button>
+          <button type="submit" class="btn btn-primary">Get Diagnosis</button>
         </form>
-        
-        {% if results %}
+        {% if diagnosis %}
           <div class="mt-3">
-            <h5>Results (Total: {{ results.0 }})</h5>
-            <ul class="list-group">
-              {% for result in results.3 %}
-                <li class="list-group-item">
-                  {% for display in result %}
-                    {{ display }} 
-                  {% endfor %}
-                </li>
-              {% endfor %}
-            </ul>
+            <h5>Possible Diagnosis:</h5>
+            <p>{{ diagnosis }}</p>
           </div>
         {% endif %}
       </div>
