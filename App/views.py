@@ -223,7 +223,9 @@ def diagnose(request):
                     "role": "system",
                     "content": (
                         "You are a helpful assistant that provides possible medical diagnoses based on symptoms. "
-                        "Always include a disclaimer that you are not a doctor and that the information is not medical advice."
+                        "When the user provides symptoms, analyze them and provide a response that only contains the most likely diagnosis."
+                        "Do not add any disclaimers or additional information. "
+                        "Responsd with 1 or 2 words that best describes the condition (e.g., 'flu', 'cold', 'COVID-19', etc."
                     )
                 },
                 {"role": "user", "content": prompt},
