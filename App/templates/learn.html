@@ -2,6 +2,29 @@
 {% load static %}
 {% block content %}
 
-
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Disease Type</th>
+            <th>View more (external)</th>
+        </tr>
+    </thead>
+    <tbody class="p-3">
+        {% for disease in Diseases %}
+            <tr>
+                <td>{{ disease.name }}</td>
+                <td>{{ disease.disease_type }}</td>
+                <td>
+                    <a class="btn btn-outline-secondary" href="{{ disease.link }}">View</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="3"><strong>Disease data failed to load.</strong></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
 {% endblock %}

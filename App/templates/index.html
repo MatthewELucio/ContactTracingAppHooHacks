@@ -72,10 +72,29 @@ function updateUserLocation() {
     }
 }
 
-// When the page loads, immediately get the user's location and then call updateUserLocation every 10 seconds.
+// On page load, update location every 10 seconds.
 window.onload = function() {
     updateUserLocation();
     setInterval(updateUserLocation, 10000);
 };
+
+// When the user leaves the page, send a beacon to finalize the location.
+window.addEventListener('unload', function() {
+    // Use navigator.sendBeacon if available.
+    if (navigator.sendBeacon) {
+        const url = '/finalize-location/';
+        // The Beacon API sends data as a Blob or FormData.
+        const data = new FormData();
+        // Optionally include CSRF token if needed (some backends may not verify for sendBeacon).
+        data.append('csrfmiddlewaretoken', getCookie('csrftoken'));
+        navigator.sendBeacon(url, data);
+    } else {
+        // Fallback: a synchronous XMLHttpRequest.
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/finalize-location/", false);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send("csrfmiddlewaretoken=" + getCookie('csrftoken'));
+    }
+});
 </script>
 {% endblock %}
