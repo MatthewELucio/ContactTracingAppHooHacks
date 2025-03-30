@@ -72,11 +72,41 @@ function updateUserLocation() {
     }
 }
 
-// On page load, update location every 10 seconds.
+// When the page loads, immediately get the user's location and then call updateUserLocation every 10 seconds.
 window.onload = function() {
     updateUserLocation();
     setInterval(updateUserLocation, 10000);
 };
+</script>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8 col-md-7">
+            <div class="content-box p-4 border rounded">
+                <h2>Notifications</h2>
+                <p>View any notifications regarding transmission below:</p>
+                <tbody class="p-3">
+                    {% if Notifications %}
+                        {% for notification in Notifications %}
+                            <tr>
+                                <td> {{ notification.date }}</td>
+                                <td> {{ notification.illness }}</td>
+                                <td> {{ notification.viewed}}</td>
+                                <td>
+                                    <a class="btn btn-outline-primary" href="{% url 'App:view_notification' notification_number=notification.pk %}">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                    <div class = "p-4 alert-primary d-flex justify-content-center">
+                        <tr>
+                            <td>No notifications at the moment.</td>
+                        </tr>
+                    </div>
+                    {% endif %}
+                </tbody>
+            </div>
+        </div>
 
         <!-- Right Column (Sidebar) -->
         <div class="col-lg-4 col-md-5">
@@ -104,24 +134,5 @@ window.onload = function() {
         </div>
     </div>
 </div>
-
-window.addEventListener('unload', function() {
-    // Use navigator.sendBeacon if available.
-    if (navigator.sendBeacon) {
-        const url = '/finalize-location/';
-        // The Beacon API sends data as a Blob or FormData.
-        const data = new FormData();
-        // Optionally include CSRF token if needed (some backends may not verify for sendBeacon).
-        data.append('csrfmiddlewaretoken', getCookie('csrftoken'));
-        navigator.sendBeacon(url, data);
-    } else {
-        // Fallback: a synchronous XMLHttpRequest.
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/finalize-location/", false);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.send("csrfmiddlewaretoken=" + getCookie('csrftoken'));
-    }
-});
-</script>
 
 {% endblock %}

@@ -7,7 +7,7 @@ import math
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from .models import LocationHistory, RelevantLocation
+from .models import LocationHistory, RelevantLocation, Disease
 import django.utils.timezone as timezone
 from .forms import PhysicalReportForm
 
@@ -24,7 +24,7 @@ def haversine(lat1, lon1, lat2, lon2):
     return R * c
 
 
-@csrf_exempt  # For demonstration only; handle CSRF properly in production.
+@csrf_exempt  # For demonstration only; ensure proper CSRF handling in production.
 @require_POST
 @login_required
 def update_location(request):
@@ -43,44 +43,46 @@ def update_location(request):
     )
     
     now = timezone.now()
-    RADIUS_THRESHOLD = 50  # meters
-    # We use a short time threshold here for updating the pending entry.
-    # (The final validation later will use 30 minutes as the required minimum.)
-    PENDING_TIMEOUT = 5 * 60  # 5 minutes (for example)
+    TIME_THRESHOLD = 20 * 60  # 30 minutes in seconds
+    window_start = now - timedelta(seconds=TIME_THRESHOLD)
+    RADIUS_THRESHOLD = 50  # in meters
 
-    # Try to fetch the latest pending RelevantLocation entry (if any).
-    pending = RelevantLocation.objects.filter(user=request.user).order_by('-end_time').first()
+    # Retrieve all location entries in the last 30 minutes.
+    recent_entries = LocationHistory.objects.filter(
+        user=request.user,
+        recorded_at__gte=window_start
+    ).order_by('recorded_at')
 
-    if pending:
-        # Compute the distance from the pending record’s reference point to the new location.
-        distance = haversine(pending.latitude, pending.longitude, latitude, longitude)
-        if distance <= RADIUS_THRESHOLD:
-            # If within threshold, update the end_time.
-            pending.end_time = now
-            pending.save()
-        else:
-            # If the user moved outside the radius, finalize the pending record:
-            duration = (pending.end_time - pending.start_time).total_seconds()
-            if duration < 30 * 60:
-                # If the duration is insufficient (under 30 minutes), delete the pending record.
-                pending.delete()
-            # Start a new pending RelevantLocation record.
-            RelevantLocation.objects.create(
+    if recent_entries.exists():
+        # Use the first entry as the reference point.
+        ref = recent_entries.first()
+        all_within_radius = True
+        for entry in recent_entries:
+            distance = haversine(ref.latitude, ref.longitude, entry.latitude, entry.longitude)
+            if distance > RADIUS_THRESHOLD:
+                all_within_radius = False
+                break
+
+        if all_within_radius:
+            # The user has been within the radius for at least 30 minutes.
+            # Check if a RelevantLocation record already exists for this period.
+            relevant = RelevantLocation.objects.filter(
                 user=request.user,
-                latitude=latitude,
-                longitude=longitude,
-                start_time=now,
-                end_time=now
-            )
-    else:
-        # No pending record exists; create one.
-        RelevantLocation.objects.create(
-            user=request.user,
-            latitude=latitude,
-            longitude=longitude,
-            start_time=now,
-            end_time=now
-        )
+                start_time__gte=window_start
+            ).order_by('start_time').first()
+            if relevant:
+                # Update its end_time to now.
+                relevant.end_time = now
+                relevant.save()
+            else:
+                # Create a new RelevantLocation record.
+                RelevantLocation.objects.create(
+                    user=request.user,
+                    latitude=ref.latitude,
+                    longitude=ref.longitude,
+                    start_time=recent_entries.first().recorded_at,
+                    end_time=now
+                )
     
     return JsonResponse({
         'status': 'success',
@@ -135,7 +137,8 @@ def report_illness(request):
 
 def learn(request):
     if request.user.is_authenticated:
-        return render(request, "learn.html")
+        diseases = Disease.objects.all()
+        return render(request, "learn.html", {'Diseases': diseases})
     else: return render(request, "login.html")
 
 def notify(request):
