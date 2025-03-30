@@ -1,6 +1,16 @@
 from django import forms
 from .models import PhysicalReport, AirborneReport
 from django.forms import DateTimeInput
+from django.contrib.auth import get_user_model
+
+
+User = get_user_model()
+
+class ProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+
 
 class PhysicalReportForm(forms.ModelForm):
      class Meta:

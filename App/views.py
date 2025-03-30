@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from .models import LocationHistory, RelevantLocation, Disease
 import django.utils.timezone as timezone
-from .forms import PhysicalReportForm, AirborneReportForm
+from .forms import PhysicalReportForm, AirborneReportForm, ProfileForm
 
 
 def haversine(lat1, lon1, lat2, lon2):
@@ -90,6 +90,24 @@ def update_location(request):
         'longitude': location_entry.longitude,
         'recorded_at': location_entry.recorded_at.isoformat()
     })
+
+@csrf_exempt  # For demonstration only; handle CSRF properly in production.
+@require_POST
+@login_required
+def finalize_location(request):
+    now = timezone.now()
+    TIME_THRESHOLD = 30 * 60  # 30 minutes in seconds
+
+    pending = RelevantLocation.objects.filter(user=request.user).order_by('-end_time').first()
+    if pending:
+        duration = (pending.end_time - pending.start_time).total_seconds()
+        if duration < TIME_THRESHOLD:
+            pending.delete()
+            return JsonResponse({'status': 'deleted', 'message': 'Relevant location deleted due to insufficient duration'})
+        else:
+            # Optionally, mark it as finalized or do nothing.
+            return JsonResponse({'status': 'kept', 'message': 'Relevant location retained'})
+    return JsonResponse({'status': 'none', 'message': 'No pending relevant location found'})
 
 def index(request):
     if request.user.is_authenticated:
@@ -186,13 +204,16 @@ def help(request):
 
 
 def profile(request):
-    if request.user.is_authenticated:
-        return render(request, "profile.html")
-    else: return render(request, "login.html")
+    user = request.user  # Get the current user
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()  # Save the updated user data
+            return render(request, 'profile.html', {'msg': 'complete'})  # Redirect to the same page after successful save
+    else:
+        form = ProfileForm(instance=user)
 
-def settings(request):
-    if request.user.is_authenticated:
-        return render(request, "settings.html")
+    return render(request, 'profile.html', {'form': form})
 
 @login_required
 def home(request):

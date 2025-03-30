@@ -1,5 +1,27 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<p>You are at HELP</p>
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-7 mr-2">
+            <h1 class="text-primary">What is <i>Hoos Sick</i>?</h1>
+            <p>We created Hoos Sick after being inspired by Apple phones and their ability to contact trace during the Covid-19 pandemic. We believe that this idea can be broadened to apply to any number of diseases, taking in location and additional data to compute risk for infection in response to how each illness is communicated.</p>
+            <p>Hoos Sick logs location data when users connect to the web app, which it then uses to construct tables of relevant location data that is parsed each time a user reports an infection. Our quad tree algorithm crunches the location and infection vectors of each reported illness to identify and notify those who were in communicative contact with the reporter.</p>
+            <h3>Where do we go from here?</h3>
+            <p>We would like to further this project by investigating bluetooth and similar networking protocols as methods for calculating cross-contact risk. Additionally, we plan on developing mobile applications that follow the Hoos Sick workflow so that more accurate/timely education data can be acquired.</p>
+            <h3>How is my data being handled?</h3>
+            <p>FILL IN</p>
+        </div>
+        <div class="card ml-auto col-md-4 text-right justify-content-end">
+            <div class="card-header">
+                <h3 class="">How do I use Hoos Sick?</h3>
+              </div>
+            <p class="pt-1">User interaction drives data collection, which is then parsed by our algorithms to contact trace with as little user interaction as possible. Users can report infections as well as interactions, which prompts our app to analyze spread and notify individuals that we contact trace.</p>
+            <p>Hoos Sick is designed to be most effective when users actively update their location data by interacting with the web app. As location data is gathered, our algorithms are able to more effectively determine whether users have come into contact. As such, we see better contact tracing and thus reduced incidents of high-degree illness spread.</p>
+        </div>
+
+    </div>
+</div>
+
 {% endblock %}

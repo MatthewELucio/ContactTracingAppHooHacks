@@ -1,2 +1,11 @@
-p {
-}
+
+    #carouselExample {
+        max-height: 350px; 
+        overflow: hidden;
+    }
+
+    .carousel-image {
+        object-fit: cover; 
+        height: 100%;  
+        width: 100%;   
+    }

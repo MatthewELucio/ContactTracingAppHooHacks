@@ -1,6 +1,66 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+
+<div class="container mt-5">
+    <div class="row d-flex justify-content-end p-4">
+        <h3 class="">Hello, {{user.username}}.</h3>
+    </div>
+    <div class="row">
+        <div class="col-lg-8 col-md-7">
+            <div class="content-box p-4 border rounded">
+                <h2>Notifications</h2>
+                <p>View any notifications regarding transmission below:</p>
+                <tbody class="p-3">
+                    {% if Notifications %}
+                        {% for notification in Notifications %}
+                            <tr>
+                                <td> {{ notification.date }}</td>
+                                <td> {{ notification.illness }}</td>
+                                <td> {{ notification.viewed}}</td>
+                                <td>
+                                    <a class="btn btn-outline-primary" href="{% url 'App:view_notification' notification_number=notification.pk %}">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                    <div class = "p-4 alert-primary d-flex justify-content-center">
+                        <tr>
+                            <td>No notifications at the moment.</td>
+                        </tr>
+                    </div>
+                    {% endif %}
+                </tbody>
+            </div>
+        </div>
+
+        <!-- Right Column (Sidebar) -->
+        <div class="col-lg-4 col-md-5">
+            <div class="sidebar-box p-4 border rounded">
+                <h4>Dashboard</h4>
+                <container class="d-flex flex-column m-3 justify-content-center">
+                    <div class = "dropdown width:100%">
+                        <button class="btn width:100% btn-secondary dropdown-toggle mt-2" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style ="width:100%">
+                            <a class="text-white">Report illness</a>
+                        </button>
+                        <div class="dropdown-menu" style ="width:100%" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item" href="{% url 'App:report_physical_illness'%}">Physical Illness</a>
+                            <a class="dropdown-item" href="{% url 'App:report_airborne_illness'%}">Airborne Illness</a>
+                            <a class="dropdown-item" href="{% url 'App:learn' %}">Not sure?</a>
+                          </div>
+                    </div>
+                    <button class="btn btn-secondary mt-2">
+                        <a class="text-white" href="{% url 'App:notify' %}">Notify user</a>
+                    </button>
+                    <button class="btn btn-secondary mt-2">
+                        <a class="text-white" href="{% url 'App:learn' %}">Learn more</a>
+                    </button>
+                </container>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="location-display">
     <p>Recording your location...</p>
 </div>
@@ -78,68 +138,5 @@ window.onload = function() {
     setInterval(updateUserLocation, 10000);
 };
 </script>
-
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-lg-8 col-md-7">
-            <div class="content-box p-4 border rounded">
-                <h2>Notifications</h2>
-                <p>View any notifications regarding transmission below:</p>
-                <tbody class="p-3">
-                    {% if Notifications %}
-                        {% for notification in Notifications %}
-                            <tr>
-                                <td> {{ notification.date }}</td>
-                                <td> {{ notification.illness }}</td>
-                                <td> {{ notification.viewed}}</td>
-                                <td>
-                                    <a class="btn btn-outline-primary" href="{% url 'App:view_notification' notification_number=notification.pk %}">View</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    {% else %}
-                    <div class = "p-4 alert-primary d-flex justify-content-center">
-                        <tr>
-                            <td>No notifications at the moment.</td>
-                            <!-- {% if messages %}
-                                <td>
-                                    {% for message in messages %}
-                                        {{ message }}
-                                    {% endfor %}
-                                </td>
-                            {% endif %} -->
-                        </tr>
-                    </div>
-                    {% endif %}
-                </tbody>
-            </div>
-        </div>
-
-        <!-- Right Column (Sidebar) -->
-        <div class="col-lg-4 col-md-5">
-            <div class="sidebar-box p-4 border rounded">
-                <h4>Dashboard</h4>
-                <container class="d-flex flex-column m-3 justify-content-center">
-                    <div class = "dropdown width:100%">
-                        <button class="btn width:100% btn-secondary dropdown-toggle mt-2" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style ="width:100%">
-                            <a class="text-white">Report illness</a>
-                        </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <a class="dropdown-item" href="{% url 'App:report_physical_illness' %}">Report Physical Illness</a>
-                            <a class="dropdown-item" href="{% url 'App:report_airborne_illness' %}">Report Airborne Illness</a>
-                            <a class="dropdown-item" href="{% url 'App:learn' %}">Not sure?</a>
-                          </div>
-                    </div>
-                    <button class="btn btn-secondary mt-2">
-                        <a class="text-white" href="{% url 'App:notify' %}">Notify user</a>
-                    </button>
-                    <button class="btn btn-secondary mt-2">
-                        <a class="text-white" href="{% url 'App:learn' %}">Learn more</a>
-                    </button>
-                </container>
-            </div>
-        </div>
-    </div>
-</div>
 
 {% endblock %}
