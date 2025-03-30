@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from .models import LocationHistory, RelevantLocation, Disease, NotificationV2
 import django.utils.timezone as timezone
-from .forms import PhysicalReportForm2, AirborneReportForm, ProfileForm
+from .forms import PhysicalReportForm2, AirborneReportForm2, ProfileForm
 from allauth.socialaccount.models import SocialAccount
 import requests
 from django.conf import settings
@@ -194,7 +194,10 @@ def finalize_location(request):
 
 def archive_notification(request):
     if request.user.is_authenticated:
-        notifications = None #update once we have data structure in models
+        notifications = NotificationV2.objects.filter(user=request.user).order_by('-created_at')
+        print(f"User {request.user} has {notifications} notifications.")
+        print(f"Notifications for {request.user.username}: {notifications.count()}")
+        print(f'')
         return render(request, "index.html", {'Notifications':notifications})
     else: return render(request, "login.html")
 
@@ -221,6 +224,7 @@ def report_physical_illness(request):
         last_names = request.POST.getlist("last_name[]")
         
         google_accounts = SocialAccount.objects.filter(provider='google')
+        print(f"Google accounts: {google_accounts}")
         
         names = []
         for first, last in zip(first_names, last_names):
@@ -229,6 +233,7 @@ def report_physical_illness(request):
                 for account in google_accounts:
                     if account.user.first_name.lower() == first.strip().lower() and account.user.last_name.lower() == last.strip().lower():
                         # Perform the necessary action with the matched user
+                        print(f"Matched user: {account.user.username}")
                         disease_instance = Disease.objects.filter(name=disease).first()
                         notif = NotificationV2.objects.create(
                             user=account.user,
@@ -252,7 +257,7 @@ def report_airborne_illness(request):
         return render(request, "login.html")
 
     if request.method == 'POST':
-        form = AirborneReportForm(request.POST)
+        form = AirborneReportForm2(request.POST)
         if form.is_valid():
             report = form.save()
 
@@ -293,7 +298,7 @@ def report_airborne_illness(request):
             return render(request, 'index.html', {'message': 'successful airborne form!'})
 
     else:
-        form = AirborneReportForm()
+        form = AirborneReportForm2()
 
     return render(request, "report_airborne.html", {"form": form})
 
