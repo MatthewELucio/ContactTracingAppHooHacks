@@ -238,6 +238,7 @@ def report_physical_illness(request):
                         notif = NotificationV2.objects.create(
                             user=account.user,
                             disease=disease_instance,
+                            notif_strength="high",  # Assuming this is the type for exposure notifications
                             message=f"You have been exposed to {disease}",
                             created_at=timezone.now()
                         )
@@ -363,52 +364,55 @@ def archive_notif(request, notif):
 @require_http_methods(["GET", "POST"])
 def diagnose(request):
     """
-    Handles both GET (to render learn.html) and POST (to process the diagnosis form).
-    On POST, it calls the ChatGPT API with the provided symptoms and returns the diagnosis
-    in the context so that learn.html can display it in the diagnosis card.
+    Handles GET (to render learn.html) and POST (to process the diagnosis form).
+    On POST, it:
+      - Uses the OpenAI API with your existing client.chat.completions.create method (using gpt-4o-mini)
+      - Provides a list of valid airborne diseases (from the database) in the prompt so that ChatGPT is limited to them.
+      - Sets a 2-hour time window and finds overlapping location entries (similar to airborne illness reporting).
+      - Looks up a matching Disease and sends notifications to potentially exposed users.
     """
+    if not request.user.is_authenticated:
+        return render(request, "login.html")
+    
     context = {}
-
-    # (Optional) If you need to pass along other data for learn.html, for example:
-    # context['Diseases'] = Disease.objects.all()
-    # context['query'] = request.GET.get('q', '')
-    # context['results'] = ...  (if you want to keep condition search results)
-
+    # Retrieve all valid airborne diseases from the database.
+    diseases = Disease.objects.filter(disease_type=Disease.AIR)
+    valid_diseases_str = ", ".join([d.name for d in diseases])
+    
     if request.method == "POST":
-        diseases = Disease.objects.filter(disease_type=Disease.AIR)
-        # Build a comma-separated string of valid disease names.
-        valid_diseases = ", ".join([d.name for d in diseases])
         symptoms = request.POST.get("symptoms", "").strip()
         if not symptoms:
             context["error"] = "Please enter your symptoms."
             return render(request, "learn.html", context)
 
-        # Build the prompt for ChatGPT.
+        # Build the prompt for ChatGPT, instructing it to choose only from the valid diseases.
         prompt = (
             f"Based on the following symptoms, provide the most likely diagnosis and any recommended next steps. "
-            f"Only choose from the following valid diseases: {valid_diseases}. "
+            f"Only choose from the following valid diseases: {valid_diseases_str}. "
             "Please include a disclaimer that you are not a doctor and that this is not medical advice.\n\nSymptoms: "
             f"{symptoms}"
         )
 
+        # Use your original OpenAI client code.
         client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
         try:
-            response = client.chat.completions.create(model="gpt-4o-mini",
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are a helpful assistant that provides possible medical diagnoses based on symptoms. "
-                        "When the user provides symptoms, analyze them and provide a response that only contains the most likely diagnosis."
-                        "Do not add any disclaimers or additional information. "
-                        "Responsd with 1 or 2 words that best describes the condition (e.g., 'flu', 'cold', 'COVID-19', etc."
-                    )
-                },
-                {"role": "user", "content": prompt},
-            ],
-            temperature=0.2,
-            max_tokens=150)
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "You are a helpful assistant that provides possible medical diagnoses based on symptoms. "
+                            "When the user provides symptoms, analyze them and provide a response that only contains the most likely diagnosis. "
+                            "Do not add any disclaimers or additional information. "
+                            "Respond with 1 or 2 words that best describe the condition (e.g., 'flu', 'cold', 'COVID-19', etc.)."
+                        )
+                    },
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.2,
+                max_tokens=150
+            )
             diagnosis = response.choices[0].message.content.strip()
         except Exception as e:
             diagnosis = f"Error contacting the diagnosis service: {e}"
@@ -416,10 +420,52 @@ def diagnose(request):
         # Add the symptoms and diagnosis to the context.
         context["symptoms"] = symptoms
         context["diagnosis"] = diagnosis
-        context["Diseases"] = diseases  # Pass the list of diseases to the template for reference
+        context["Diseases"] = diseases  # Pass the list of airborne diseases for reference
 
-    # Render learn.html with the current context.
-    return render(request, "learn.html", context)
+        # --- Notification Logic (similar to report_airborne_illness) ---
+        infection_end = timezone.now()
+        infection_start = infection_end - timedelta(hours=2)
+        radius_threshold = 50  # in meters
+
+        # Find overlapping location entries from other users.
+        overlapping_locations = RelevantLocation.objects.filter(
+            start_time__lt=infection_end,
+            end_time__gt=infection_start
+        ).exclude(user=request.user)
+        
+        # Get current user's locations.
+        user_locations = RelevantLocation.objects.filter(
+            user=request.user,
+            start_time__lt=infection_end,
+            end_time__gt=infection_start
+        )
+
+        potential_infected = set()
+        for loc in user_locations:
+            for entry in overlapping_locations:
+                distance = haversine(loc.latitude, loc.longitude, entry.latitude, entry.longitude)
+                if distance <= radius_threshold:
+                    potential_infected.add(entry.user)
+
+        # Look up a Disease instance matching the diagnosis (case-insensitive).
+        disease_instance = Disease.objects.filter(name__iexact=diagnosis).first()
+
+        # Send notifications to each potentially exposed user (excluding the current user).
+        if disease_instance:
+            for user in potential_infected:
+                if user != request.user:
+                    NotificationV2.objects.create(
+                        user=user,
+                        disease=disease_instance,
+                        message=f"Exposure alert: You have been exposed to {diagnosis}.",
+                        created_at=timezone.now()
+                    )
+        # Optionally, handle the case where no matching Disease is found.
+        context["message"] = f"Diagnosis complete. Notifications sent to {len(potential_infected)} users."
+        
+        return render(request, "learn.html", context)
+    else:
+        return render(request, "learn.html", context)
 # def condition_search(request):
 #     """
 #     This view queries the external Medical Conditions API and renders the learn.html page.
