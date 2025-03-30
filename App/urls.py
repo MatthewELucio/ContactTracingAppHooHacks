@@ -31,6 +31,7 @@ urlpatterns = [
     path("profile/", views.profile, name='profile'),
     path("home/", views.home, name='home'),
     path("accounts/", include("allauth.urls")),
+    path('diagnose/', views.diagnose, name='diagnose'),
     path('report_physical_illness/', views.report_physical_illness, name='report_physical_illness'),
     path('report_airborne_illness/', views.report_airborne_illness, name='report_airborne_illness'),
     path("archive/", views.archive, name='archive'),

@@ -14,6 +14,13 @@ from .models import LocationHistory, RelevantLocation, Disease, NotificationV2
 import django.utils.timezone as timezone
 from .forms import PhysicalReportForm2, AirborneReportForm, ProfileForm
 from allauth.socialaccount.models import SocialAccount
+import requests
+from django.conf import settings
+from django.views.decorators.http import require_GET
+from openai import OpenAI
+from django.conf import settings
+from django.views.decorators.http import require_http_methods
+import os
 
 
 def haversine(lat1, lon1, lat2, lon2):
@@ -110,14 +117,14 @@ def update_location(request):
         longitude = data['longitude']
     except (KeyError, json.JSONDecodeError):
         return JsonResponse({'status': 'error', 'message': 'Invalid data'}, status=400)
-    
+
     # Always record the location history.
     location_entry = LocationHistory.objects.create(
         user=request.user,
         latitude=latitude,
         longitude=longitude
     )
-    
+
     now = timezone.now()
     TIME_THRESHOLD = 20 * 60  # 30 minutes in seconds
     window_start = now - timedelta(seconds=TIME_THRESHOLD)
@@ -159,7 +166,7 @@ def update_location(request):
                     start_time=recent_entries.first().recorded_at,
                     end_time=now
                 )
-    
+
     return JsonResponse({
         'status': 'success',
         'latitude': location_entry.latitude,
@@ -190,7 +197,7 @@ def index(request):
         notifications = None #update once we have data structure in models
         return render(request, "index.html", {'Notifications':notifications})
     else: return render(request, "login.html")
-
+    
 def report_physical_illness(request):
     if not request.user.is_authenticated:
         return render(request, "login.html")
@@ -278,7 +285,6 @@ def report_airborne_illness(request):
 
     return render(request, "report_airborne.html", {"form": form})
 
-
 def learn(request):
     if request.user.is_authenticated:
         diseases = Disease.objects.all()
@@ -323,3 +329,121 @@ def home(request):
     if request.user.is_authenticated:
         return render(request, "home.html", {'email': request.user.email}) 
     else: return render(request, "login.html")
+
+
+@require_http_methods(["GET", "POST"])
+def diagnose(request):
+    """
+    Handles both GET (to render learn.html) and POST (to process the diagnosis form).
+    On POST, it calls the ChatGPT API with the provided symptoms and returns the diagnosis
+    in the context so that learn.html can display it in the diagnosis card.
+    """
+    context = {}
+
+    # (Optional) If you need to pass along other data for learn.html, for example:
+    # context['Diseases'] = Disease.objects.all()
+    # context['query'] = request.GET.get('q', '')
+    # context['results'] = ...  (if you want to keep condition search results)
+
+    if request.method == "POST":
+        symptoms = request.POST.get("symptoms", "").strip()
+        if not symptoms:
+            context["error"] = "Please enter your symptoms."
+            return render(request, "learn.html", context)
+
+        # Build the prompt for ChatGPT.
+        prompt = (
+            f"Based on the following symptoms, provide the most likely diagnosis and any recommended next steps. "
+            "Please include a disclaimer that you are not a doctor and that this is not medical advice.\n\nSymptoms: "
+            f"{symptoms}"
+        )
+
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+
+        try:
+            response = client.chat.completions.create(model="gpt-4o-mini",
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a helpful assistant that provides possible medical diagnoses based on symptoms. "
+                        "When the user provides symptoms, analyze them and provide a response that only contains the most likely diagnosis."
+                        "Do not add any disclaimers or additional information. "
+                        "Responsd with 1 or 2 words that best describes the condition (e.g., 'flu', 'cold', 'COVID-19', etc."
+                    )
+                },
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.2,
+            max_tokens=150)
+            diagnosis = response.choices[0].message.content.strip()
+        except Exception as e:
+            diagnosis = f"Error contacting the diagnosis service: {e}"
+
+        # Add the symptoms and diagnosis to the context.
+        context["symptoms"] = symptoms
+        context["diagnosis"] = diagnosis
+
+    # Render learn.html with the current context.
+    return render(request, "learn.html", context)
+# def condition_search(request):
+#     """
+#     This view queries the external Medical Conditions API and renders the learn.html page.
+#     The learn.html template should include the condition search card that uses the provided
+#     context variables (query, results, error) to display search results.
+#     """
+#     query = request.GET.get('q', '')  # Get the search term from the query string
+#     results = None
+#     error = None
+
+#     if query:
+#         base_url = "https://clinicaltables.nlm.nih.gov/api/conditions/v3/search"
+#         params = {
+#             'terms': query,                     # The search term(s)
+#             'maxList': 7,                       # Limit number of returned results (default is 7)
+#             'df': 'term_icd9_code,primary_name', # Fields to display
+#             # Other parameters can be added here as needed:
+#             # 'sf': 'consumer_name,primary_name,...',
+#             # 'ef': 'term_icd9_code,term_icd9_text',
+#             # 'offset': 0, etc.
+#         }
+#         try:
+#             response = requests.get(base_url, params=params, timeout=5)
+#             response.raise_for_status()  # Raise an exception for HTTP errors
+#             results = response.json()
+#         except requests.RequestException as e:
+#             error = str(e)
+
+#     context = {
+#         'query': query,
+#         'results': results,
+#         'error': error,
+#     }
+#     # Render the learn.html template so that the condition search appears in the right column.
+#     return render(request, 'learn.html', context)
+
+# @require_GET
+# def condition_autocomplete(request):
+#     """
+#     This view returns a JSON response containing a list of primary names for medical conditions,
+#     which can be used for an autocomplete feature on the frontend.
+#     """
+#     query = request.GET.get('q', '')
+#     data = {}
+#     if query:
+#         base_url = "https://clinicaltables.nlm.nih.gov/api/conditions/v3/search"
+#         params = {
+#             'terms': query,
+#             'maxList': 7,
+#             'df': 'primary_name',
+#         }
+#         try:
+#             response = requests.get(base_url, params=params, timeout=5)
+#             response.raise_for_status()
+#             results = response.json()
+#             # Extract the primary names from the display array (located at index 3).
+#             display_results = [item[0] for item in results[3]] if results and len(results) >= 4 else []
+#             data = {'results': display_results}
+#         except Exception as e:
+#             data = {'error': str(e)}
+#     return JsonResponse(data)
