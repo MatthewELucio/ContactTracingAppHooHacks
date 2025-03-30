@@ -36,7 +36,7 @@ class Disease(models.Model):
 #     def __str__(self):
 #         return f"{self.first_name} {self.last_name} ({self.username})"
 
-class Notification(models.Model):
+class NotificationV2(models.Model):
     # receiving user for the notification
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
