@@ -123,11 +123,6 @@ def learn(request):
         return render(request, "learn.html", {'Diseases': diseases})
     else: return render(request, "login.html")
 
-def notify(request):
-    if request.user.is_authenticated:
-        return render(request, "notify.html")
-    else: return render(request, "login.html")
-
 def login(request):
     return render(request, "login.html")
 
