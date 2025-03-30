@@ -36,6 +36,28 @@ class Disease(models.Model):
 #     def __str__(self):
 #         return f"{self.first_name} {self.last_name} ({self.username})"
 
+class NotificationV2(models.Model):
+    # receiving user for the notification
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='notifications',
+        null = True
+    )
+    disease = models.ForeignKey(
+        Disease,
+        on_delete=models.CASCADE,
+        related_name='notifications',
+        help_text="The disease associated with this notification"
+    )
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)
+    archived = models.BooleanField(default=False)
+
+    def str(self):
+        return f"Notification for {self.user.username} at {self.created_at} - Read: {self.read}"
+
 class Infection(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -116,3 +138,20 @@ class PhysicalReport(models.Model):
 
     def __str__(self):
         return self.name
+
+class AirborneReport(models.Model):
+    symptoms = models.CharField(max_length=255)
+    symptoms_appeared_date = models.DateTimeField()
+    diagnosis_date = models.DateTimeField(null=True, blank=True)
+    illness = models.CharField(
+        max_length=100,
+        choices=[
+            ('cc', 'Commonn Cold'),
+            ('flu', 'Influenza (Flu)'),
+            ('other', 'Other')
+        ]
+    )
+    was_diagnosed = models.BooleanField(default=False)  # Checkbox
+
+    def __str__(self):
+        return self.symptoms

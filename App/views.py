@@ -17,6 +17,7 @@ from openai import OpenAI
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
 import os
+from .forms import PhysicalReportForm, AirborneReportForm, ProfileForm
 
 def haversine(lat1, lon1, lat2, lon2):
     """Calculate the great circle distance in meters between two points on Earth."""
@@ -120,36 +121,71 @@ def index(request):
         notifications = None #update once we have data structure in models
         return render(request, "index.html", {'Notifications':notifications})
     else: return render(request, "login.html")
+    
+def report_physical_illness(request):
+    if not request.user.is_authenticated:
+        return render(request, "login.html")
 
-def report_illness(request):
-    if request.user.is_authenticated:
-        if request.method == 'POST':
-            form = PhysicalReportForm(request.POST)
-            if form.is_valid():
-                form.save()  # Save the data to the database
-                return redirect('index')  # Redirect to a success page or another view
-        else:
-            type = request.GET.get('type', 'physical')
-            if type == 'physical':
-                form = PhysicalReportForm()
-            elif type == 'airborne':
-                #form = AirborneReportFrom()
-                form = PhysicalReportForm()
-            else:
-                return render(request, 'index.html', {'error': 'form'})
+    if request.method == 'POST':
+        form = PhysicalReportForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return render(request, 'index.html', {'message': 'successful physical form'})
+    else:
+        form = PhysicalReportForm()
 
-        return render(request, 'report.html', {'form': form})
-    else: return render(request, "login.html")
+    return render(request, 'report_physical.html', {'form': form})
+
+def report_airborne_illness(request):
+    if not request.user.is_authenticated:
+        return render(request, "login.html")
+
+    if request.method == 'POST':
+        form = AirborneReportForm(request.POST)
+        if form.is_valid():
+            report = form.save()
+
+            infection_start = report.symptoms_appeared_date
+            infection_end = report.diagnosis_date if report.diagnosis_date else timezone.now()
+
+            print(f"User {request.user.username} reported illness from {infection_start} to {infection_end}")
+
+            radius_threshold = 50
+            potential_infected = set()
+
+            overlapping_locations = RelevantLocation.objects.filter(
+                start_time__lt=infection_end,
+                end_time__gt=infection_start
+            ).exclude(user=request.user)
+
+            print(f"Found {overlapping_locations.count()} overlapping location entries.")
+            user_locations = RelevantLocation.objects.filter(
+                user=request.user, start_time__lt=infection_end, end_time__gt=infection_start
+            )
+
+            for loc in user_locations:
+                for entry in overlapping_locations:
+                    distance = haversine(loc.latitude, loc.longitude, entry.latitude, entry.longitude)
+                    print(f"Checking {entry.user.username} at ({entry.latitude}, {entry.longitude}) - Distance: {distance}m")
+
+                    if distance <= radius_threshold:
+                        potential_infected.add(entry.user)
+
+            print(f"Potential infected users: {len(potential_infected)}")
+            for user in potential_infected:
+                print(f"Exposed user: {user.username}")
+
+            return render(request, 'index.html', {'message': 'successful airborne form!'})
+
+    else:
+        form = AirborneReportForm()
+
+    return render(request, "report_airborne.html", {"form": form})
 
 def learn(request):
     if request.user.is_authenticated:
         diseases = Disease.objects.all()
         return render(request, "learn.html", {'Diseases': diseases})
-    else: return render(request, "login.html")
-
-def notify(request):
-    if request.user.is_authenticated:
-        return render(request, "notify.html")
     else: return render(request, "login.html")
 
 def login(request):
@@ -167,6 +203,11 @@ def home(request):
 def help(request):
     return render(request, "help.html")
 
+def archive(request):
+    if request.user.is_authenticated:
+        notifications = None
+        return render(request, "archive.html", {'Notifications': notifications}) 
+    else: return render(request, "login.html")
 
 def profile(request):
     user = request.user  # Get the current user
