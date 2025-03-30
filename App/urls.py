@@ -24,6 +24,7 @@ app_name = 'App'
 urlpatterns = [
     path("", views.index, name='index'),
     path('update-location/', views.update_location, name='update_location'),
+    path("finalize-location/", views.finalize_location, name="finalize_location"),
     path("login/", views.login, name='login'),
     path("logout/", views.logout_view, name='logout'),
     path("settings/", views.settings, name='settings'),
