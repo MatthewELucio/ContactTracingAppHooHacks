@@ -294,7 +294,6 @@ def report_airborne_illness(request):
                 end_time__gt=infection_start
             ).exclude(user=request.user)
 
-            print(f"Found {overlapping_locations.count()} overlapping location entries.")
             user_locations = RelevantLocation.objects.filter(
                 user=request.user, start_time__lt=infection_end, end_time__gt=infection_start
             )
@@ -302,12 +301,10 @@ def report_airborne_illness(request):
             for loc in user_locations:
                 for entry in overlapping_locations:
                     distance = haversine(loc.latitude, loc.longitude, entry.latitude, entry.longitude)
-                    print(f"Checking {entry.user.username} at ({entry.latitude}, {entry.longitude}) - Distance: {distance}m")
 
                     if distance <= radius_threshold:
                         potential_infected.add(entry.user)
 
-            print(f"Potential infected users: {potential_infected}")
             for person in potential_infected:
                 NotificationV2.objects.create(
                     user=person,  
@@ -317,7 +314,6 @@ def report_airborne_illness(request):
                     created_at=timezone.now()
                 )
                 send(person.email, report.disease.name)  # Send email notification
-
 
             return render(request, 'index.html', {'message': 'successful airborne form!'})
 
