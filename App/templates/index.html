@@ -38,10 +38,7 @@
                                         <td>{{ notification.disease }}</td>
                                         <td>{{ notification.message }}</td>
                                         <td>
-                                            <button class="btn btn-outline-primary">View</button>
-                                        </td>
-                                        <td>
-                                            <button class="btn btn-outline-primary">Archive</button>
+                                            <button class="btn btn-outline-primary"><a href="{% url 'App:archive_notif' notif=notification.id %}">Archive</a></button>
                                         </td>
                                     </tr>
                                 {% endif %}
