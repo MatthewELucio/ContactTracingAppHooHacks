@@ -29,10 +29,16 @@ urlpatterns = [
     path("logout/", views.logout_view, name='logout'),
     path("settings/", views.settings, name='settings'),
     path("help/", views.help, name='help'),
+<<<<<<< HEAD
     path("profile/", views.profile, name='profile'),
     path("home/", views.home, name='home'),
     path("accounts/", include("allauth.urls")),
     path("report_illness/", views.report_illness, name='report_illness'),
     path("notify/", views.notify, name='notify'),
     path("learn/", views.learn, name='learn')
+=======
+    path("profilie/", views.profile, name='profile'),
+    path("home/", views.home, name='home'),
+    path("accounts/", include("allauth.urls")),
+>>>>>>> new_ui
 ]

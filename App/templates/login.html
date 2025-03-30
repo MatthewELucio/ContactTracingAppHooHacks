@@ -1,3 +1,4 @@
+
 {% load static %}
 {% block content %}
 <!DOCTYPE html>
@@ -13,24 +14,19 @@
         <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" rel="stylesheet">
     </head>
 
-    <body class="text-center">
+    <body>
         <header>
-            <nav class="navbar navbar-expand-lg navbar-light bg-dark">
-                <h4 class="navbar-brand text-light">Hoos Sick</h4>
-            </nav>
             <div class="top-banner"></div>
             <div class="bottom-banner">
-                <h1 class="title p-5">Welcome to Hoos Sick!</h1>
+                <h1 class="title">Log-In Page</h1>
             </div>
         </header>
         <div class = "main-picture">
             <div class="overlay"></div>
                 <div class="content">
                     {% load socialaccount %}
-                    <h2 class = "p-2">Sign up or in:</h2>
-                    <button type="button" class="btn btn-primary">
-                        <a class = "text-white" href="{% provider_login_url 'google' %}?next=/">Log in with google</a>
-                    </button>
+                    <h2>Google Login</h2>
+                    <a href="{% provider_login_url 'google' %}?next=/home">Log in with google</a>
                 </div>
         </div>
         <div class="p-5 bg-white" ></div>
@@ -45,4 +41,3 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"></script>
     </body>
     </html>
-{% endblock %}
