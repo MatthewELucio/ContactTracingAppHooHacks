@@ -105,7 +105,14 @@ def report_illness(request):
                 form.save()  # Save the data to the database
                 return redirect('index')  # Redirect to a success page or another view
         else:
-            form = PhysicalReportForm()
+            type = request.GET.get('type', 'physical')
+            if type == 'physical':
+                form = PhysicalReportForm()
+            elif type == 'airborne':
+                #form = AirborneReportFrom()
+                form = PhysicalReportForm()
+            else:
+                return render(request, 'index.html', {'error': 'form'})
         
         return render(request, 'report.html', {'form': form})
     else: return render(request, "login.html")
