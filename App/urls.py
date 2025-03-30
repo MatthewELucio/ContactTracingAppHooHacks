@@ -34,5 +34,6 @@ urlpatterns = [
     path('report_physical_illness/', views.report_physical_illness, name='report_physical_illness'),
     path('report_airborne_illness/', views.report_airborne_illness, name='report_airborne_illness'),
     path("archive/", views.archive, name='archive'),
-    path("learn/", views.learn, name='learn')
+    path("learn/", views.learn, name='learn'),
+    path("admin_visualization/", views.admin_visualization_view, name="admin_visualization_view"),
 ]
