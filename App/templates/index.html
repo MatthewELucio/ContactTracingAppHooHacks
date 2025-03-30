@@ -13,6 +13,7 @@
                 <p>View any notifications regarding transmission below:</p>
                 <tbody class="p-3">
                     {% if Notifications %}
+                        <p>Notifications:</p>
                         {% for notification in Notifications %}
                             {% if not notification.archived %}
                                 <tr>
