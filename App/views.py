@@ -138,6 +138,11 @@ def home(request):
 def help(request):
     return render(request, "help.html")
 
+def archive(request):
+    if request.user.is_authenticated:
+        notifications = None
+        return render(request, "archive.html", {'Notifications': notifications}) 
+    else: return render(request, "login.html")
 
 def profile(request):
     user = request.user  # Get the current user

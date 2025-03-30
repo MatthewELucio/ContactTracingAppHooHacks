@@ -36,6 +36,28 @@ class Disease(models.Model):
 #     def __str__(self):
 #         return f"{self.first_name} {self.last_name} ({self.username})"
 
+class Notification(models.Model):
+    # receiving user for the notification
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='notifications',
+        null = True
+    )
+    disease = models.ForeignKey(
+        Disease,
+        on_delete=models.CASCADE,
+        related_name='notifications',
+        help_text="The disease associated with this notification"
+    )
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)
+    archived = models.BooleanField(default=False)
+
+    def str(self):
+        return f"Notification for {self.user.username} at {self.created_at} - Read: {self.read}"
+
 class Infection(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,

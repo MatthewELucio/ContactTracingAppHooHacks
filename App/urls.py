@@ -31,5 +31,6 @@ urlpatterns = [
     path("home/", views.home, name='home'),
     path("accounts/", include("allauth.urls")),
     path("report_illness/", views.report_illness, name='report_illness'),
-    path("learn/", views.learn, name='learn')
+    path("learn/", views.learn, name='learn'),
+    path("archive/", views.archive, name='archive'),
 ]
