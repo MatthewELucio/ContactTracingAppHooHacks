@@ -80,6 +80,9 @@ window.onload = function() {
 </script>
 
 <div class="container mt-5">
+    <div class="row d-flex justify-content-end p-4">
+        <h3 class="">Hello, {{user.username}}.</h3>
+    </div>
     <div class="row">
         <div class="col-lg-8 col-md-7">
             <div class="content-box p-4 border rounded">
@@ -117,7 +120,7 @@ window.onload = function() {
                         <button class="btn width:100% btn-secondary dropdown-toggle mt-2" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style ="width:100%">
                             <a class="text-white">Report illness</a>
                         </button>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <div class="dropdown-menu" style ="width:100%" aria-labelledby="dropdownMenuButton">
                             <a class="dropdown-item" href="{% url 'App:report_illness'%}?type=physical">Physical Illness</a>
                             <a class="dropdown-item" href="{% url 'App:report_illness'%}?type=airborne">Airborne Illness</a>
                             <a class="dropdown-item" href="{% url 'App:learn' %}">Not sure?</a>
