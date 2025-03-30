@@ -131,17 +131,40 @@ class PhysicalReport2(models.Model):
     def __str__(self):
         return self.disease
 
-class AirborneReport(models.Model):
+# class AirborneReport(models.Model):
+#     symptoms = models.CharField(max_length=255)
+#     symptoms_appeared_date = models.DateTimeField()
+#     diagnosis_date = models.DateTimeField(null=True, blank=True)
+#     illness = models.CharField(
+#         max_length=100,
+#         choices=[
+#             ('cc', 'Commonn Cold'),
+#             ('flu', 'Influenza (Flu)'),
+#             ('other', 'Other')
+#         ]
+#     )
+#     was_diagnosed = models.BooleanField(default=False)  # Checkbox
+
+#     def __str__(self):
+#         return self.symptoms
+
+class AirborneReport2(models.Model):
     symptoms = models.CharField(max_length=255)
     symptoms_appeared_date = models.DateTimeField()
     diagnosis_date = models.DateTimeField(null=True, blank=True)
-    illness = models.CharField(
-        max_length=100,
-        choices=[
-            ('cc', 'Commonn Cold'),
-            ('flu', 'Influenza (Flu)'),
-            ('other', 'Other')
-        ]
+    # illness = models.CharField(
+    #     max_length=100,
+    #     choices=[
+    #         ('cc', 'Commonn Cold'),
+    #         ('flu', 'Influenza (Flu)'),
+    #         ('other', 'Other')
+    #     ]
+    # )
+    disease = models.ForeignKey(
+        Disease,
+        on_delete=models.CASCADE,
+        related_name='airborne_reports',
+        help_text="The disease associated with this airborne report"
     )
     was_diagnosed = models.BooleanField(default=False)  # Checkbox
 
