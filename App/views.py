@@ -363,6 +363,7 @@ def diagnose(request):
     # context['results'] = ...  (if you want to keep condition search results)
 
     if request.method == "POST":
+        diseases = Disease.objects.all()
         symptoms = request.POST.get("symptoms", "").strip()
         if not symptoms:
             context["error"] = "Please enter your symptoms."
@@ -400,6 +401,7 @@ def diagnose(request):
         # Add the symptoms and diagnosis to the context.
         context["symptoms"] = symptoms
         context["diagnosis"] = diagnosis
+        context["Diseases"] = diseases  # Pass the list of diseases to the template for reference
 
     # Render learn.html with the current context.
     return render(request, "learn.html", context)
