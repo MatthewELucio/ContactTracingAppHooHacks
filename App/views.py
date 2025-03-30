@@ -129,7 +129,7 @@ def report_illness(request):
 def learn(request):
     if request.user.is_authenticated:
         diseases = Disease.objects.all()
-        return render(request, "learn.html", {'diseases': diseases})
+        return render(request, "learn.html", {'Diseases': diseases})
     else: return render(request, "login.html")
 
 def notify(request):

@@ -17,6 +17,7 @@ class Disease(models.Model):
         choices=DISEASE_TYPE_CHOICES,
         help_text="Type of disease (air or physical)"
     )
+    learn_link = models.CharField(max_length=100)
 
     def __str__(self):
         return self.name
