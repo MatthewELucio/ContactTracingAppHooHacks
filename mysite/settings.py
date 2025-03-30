@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-!+cgc*3@r)xh=kaqznl2*7inof1wi-1dus3m9*$4x6+#qrd=!p"
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG') == 'True'
@@ -93,21 +93,21 @@ WSGI_APPLICATION = "mysite.wsgi.application"
 # DEBUG = os.getenv('DEBUG')
 # password = os.getenv('DATABASE_PASSWORD')
 
-if 'DATABASE_URL' in os.environ:
-    DATABASES = {
-        'default': dj_database_url.config(
-            default=os.environ['DATABASE_URL'],
-            ssl_require=True   # Enforce SSL if required (Heroku Postgres usually does)
-        )
-    }
-else:
-    # Testing/Local Development: Use SQLite
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+# if 'DATABASE_URL' in os.environ:
+DATABASES = {
+    'default': dj_database_url.config(
+        default=os.environ['DATABASE_URL'],
+        ssl_require=True   # Enforce SSL if required (Heroku Postgres usually does)
+    )
+}
+# else:
+#     # Testing/Local Development: Use SQLite
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
