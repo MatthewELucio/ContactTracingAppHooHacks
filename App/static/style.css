@@ -9,3 +9,21 @@
         height: 100%;  
         width: 100%;   
     }
+
+    .navclass {
+        transition: transform 0.3s ease-in-out;
+      }
+
+    .navimage {
+        width: 40px;
+        height: auto;
+      }
+
+    .logoimage {
+        width: 110px;
+        height: auto;
+      }  
+      
+    .navclass:hover {
+        transform: scale(1.1);  /* Increase size by 10% */
+    }
