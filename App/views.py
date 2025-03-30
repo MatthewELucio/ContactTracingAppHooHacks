@@ -1,9 +1,12 @@
 from datetime import timedelta
 from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import logout
-import json
-import math
+from django.contrib.auth.models import Group
+import math, random, datetime, json, folium, os
+from folium.plugins import TimestampedGeoJson
+from datetime import datetime
+from django.conf import settings
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -30,6 +33,78 @@ def haversine(lat1, lon1, lat2, lon2):
     a = math.sin(delta_phi/2)**2 + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda/2)**2
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     return R * c
+
+def is_site_admin(user):
+    return user.is_authenticated and user.groups.filter(name="site-admin").exists()
+
+@user_passes_test(is_site_admin, login_url='/login')
+def admin_visualization_view(request):
+    location_entries = LocationHistory.objects.all()
+    user_locations = [
+        (entry.user, entry.latitude, entry.longitude, entry.recorded_at) for entry in location_entries
+    ]
+
+    map_filename = "exposure_map.html"
+    map_path = os.path.join(settings.BASE_DIR, 'static', map_filename)
+
+    generate_exposure_map(user_locations, save_path=map_path)
+
+    return render(request, "admin_visualization.html", {"map_path": f"/static/{map_filename}"})
+
+def generate_exposure_map(user_locations, radius=50, save_path=None):
+    if not user_locations:
+        print("No user locations provided.")
+        return None
+
+    print(f"Generating map for {len(user_locations)} locations...")
+
+    first_location = user_locations[0]
+    map_center = (first_location[1], first_location[2])
+
+    exposure_map = folium.Map(location=map_center, zoom_start=15, control_scale=True)
+
+    colors = ["red", "blue", "green", "orange", "purple", "brown", "pink", "gray"]
+    user_colors = {}
+
+    features = []
+    for username, lat, lon, timestamp in user_locations:
+        if username not in user_colors:
+            user_colors[username] = random.choice(colors)
+
+        color = user_colors[username]
+        # popup_text = f"{username} - {timestamp.strftime('%Y-%m-%d %H:%M:%S')}"
+        
+        feature = {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [lon, lat],
+            },
+            "properties": {
+                "time": timestamp.isoformat(),
+                "style": {"color": color},
+                "icon": "circle",
+                # "popup": popup_text
+            },
+        }
+        features.append(feature)
+
+    TimestampedGeoJson(
+        {"type": "FeatureCollection", "features": features},
+        period="PT5M",
+        add_last_point=True,
+        auto_play=True,
+        loop=True,
+        max_speed=1,
+        loop_button=True,
+        date_options="YYYY-MM-DD HH:mm:ss",
+        time_slider_drag_update=True,
+    ).add_to(exposure_map)
+
+    if save_path:
+        exposure_map.save(save_path)
+
+    return exposure_map
 
 
 @csrf_exempt  # For demonstration only; ensure proper CSRF handling in production.
@@ -208,8 +283,12 @@ def report_airborne_illness(request):
                         potential_infected.add(entry.user)
 
             print(f"Potential infected users: {len(potential_infected)}")
-            for user in potential_infected:
-                print(f"Exposed user: {user.username}")
+            # for person in potential_infected:
+            #     NotificationV2.objects.create(
+            #         user=person.user,  
+            #         disease=report.illness, 
+            #         message=f"Exposure alert: You may have been exposed to {report.illness}.",
+            #     )
 
             return render(request, 'index.html', {'message': 'successful airborne form!'})
 

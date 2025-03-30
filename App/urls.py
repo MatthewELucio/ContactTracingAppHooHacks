@@ -38,5 +38,5 @@ urlpatterns = [
     path("learn/", views.learn, name='learn'),
     path("view_notification/", views.view_notification, name ='view_notification'),
     path("archive_notification/", views.archive_notification, name ='archive_notification'),
-
+    path("admin_visualization/", views.admin_visualization_view, name='admin_visualization_view')
 ]

@@ -37,6 +37,10 @@
                 <img src="{% static 'settings_light.png' %}" class="img-fluid navimage" alt="Responsive image">
                 <span>Profile</span></a>
             </li>
+            {% if request.user.groups.all.0.name == "site-admin" %}
+                <a href="{% url 'App:admin_visualization_view' %}" class="btn btn-danger">View Exposure Map</a>
+            {% endif %}
+
         </ul>
     </nav>
         {% block content %}
