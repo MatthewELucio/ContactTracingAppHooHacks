@@ -2,63 +2,86 @@
 {% load static %}
 {% block content %}
 
-<!-- names_template.html -->
-<div class="mx-auto pt-4 col-md-6">
-  <div class="card p-2 pb-4">
-    <div class="card-header">
-      <h1>Report physical illness</h1>
-    </div>
-  <form class="pt-4" method="post">
-      {% csrf_token %}
-      {{ form.as_p }}
-
-      <h2> Enter physical illness contacts:</h2>
-
-      <div id="names-container">
-        <div class="name-row">
-          <label>First Name: <input type="text" name="first_name[]" /></label>
-          <label>Last Name: <input type="text" name="last_name[]" /></label>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <div class="card shadow-sm" style="background: linear-gradient(to bottom, #e0f7ff, #b3e5fc);">
+        <div class="card-header bg-info text-white">
+          <h3 class="mb-0">Report Physical Illness</h3>
+        </div>
+        <div class="card-body">
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              {{ form.as_p }}
+            </div>
+            <h5 class="mt-4">Enter Physical Illness Contacts:</h5>
+            <div id="names-container">
+              <div class="row mb-3 name-row">
+                <div class="col">
+                  <label class="form-label">First Name:</label>
+                  <input type="text" name="first_name[]" class="form-control" placeholder="First Name">
+                </div>
+                <div class="col">
+                  <label class="form-label">Last Name:</label>
+                  <input type="text" name="last_name[]" class="form-control" placeholder="Last Name">
+                </div>
+              </div>
+            </div>
+            <div class="mb-3">
+              <button type="button" id="add-name" class="btn btn-outline-primary">Add Name</button>
+            </div>
+            <div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+          </form>
         </div>
       </div>
-      <div class = "pt-3">
-        <button type="button" id="add-name">Add Name</button>
-      <input type="submit" value="Submit">
-      </div>
-    </form>
     </div>
+  </div>
 </div>
   
-  <script>
-  // When the "Add Name" button is clicked, create another set of inputs
-  document.getElementById("add-name").addEventListener("click", function() {
-      // Create a new container div for the extra inputs
-      var newRow = document.createElement("div");
-      newRow.classList.add("name-row");
-      
-      // Create input for first name
-      var firstNameLabel = document.createElement("label");
-      firstNameLabel.innerText = "First Name: ";
-      var firstNameInput = document.createElement("input");
-      firstNameInput.type = "text";
-      firstNameInput.name = "first_name[]";
-      firstNameLabel.appendChild(firstNameInput);
-      
-      // Create input for last name
-      var lastNameLabel = document.createElement("label");
-      lastNameLabel.innerText = "Last Name: ";
-      var lastNameInput = document.createElement("input");
-      lastNameInput.type = "text";
-      lastNameInput.name = "last_name[]";
-      lastNameLabel.appendChild(lastNameInput);
-      
-      // Append inputs to the new row
-      newRow.appendChild(firstNameLabel);
-      newRow.appendChild(lastNameLabel);
-      
-      // Append the new row to the container
-      document.getElementById("names-container").appendChild(newRow);
-  });
-  </script>
-  
+<script>
+document.getElementById("add-name").addEventListener("click", function() {
+    // Create a new row for additional name inputs
+    var newRow = document.createElement("div");
+    newRow.classList.add("row", "mb-3", "name-row");
+    
+    // Create the first name column
+    var colFirst = document.createElement("div");
+    colFirst.classList.add("col");
+    var firstLabel = document.createElement("label");
+    firstLabel.classList.add("form-label");
+    firstLabel.innerText = "First Name:";
+    var firstInput = document.createElement("input");
+    firstInput.type = "text";
+    firstInput.name = "first_name[]";
+    firstInput.classList.add("form-control");
+    firstInput.placeholder = "First Name";
+    colFirst.appendChild(firstLabel);
+    colFirst.appendChild(firstInput);
+    
+    // Create the last name column
+    var colLast = document.createElement("div");
+    colLast.classList.add("col");
+    var lastLabel = document.createElement("label");
+    lastLabel.classList.add("form-label");
+    lastLabel.innerText = "Last Name:";
+    var lastInput = document.createElement("input");
+    lastInput.type = "text";
+    lastInput.name = "last_name[]";
+    lastInput.classList.add("form-control");
+    lastInput.placeholder = "Last Name";
+    colLast.appendChild(lastLabel);
+    colLast.appendChild(lastInput);
+    
+    // Append both columns to the new row
+    newRow.appendChild(colFirst);
+    newRow.appendChild(colLast);
+    
+    // Append the new row to the container
+    document.getElementById("names-container").appendChild(newRow);
+});
+</script>
 
 {% endblock %}
