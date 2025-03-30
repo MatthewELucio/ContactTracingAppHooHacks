@@ -18,7 +18,7 @@
       }
 
     .sniffle {
-        transition: transform 0.1s ease;
+        transition: transform 0.2s ease;
     }
     .sniffle:hover {
         content: url('sneeze.png');
@@ -29,8 +29,7 @@
     /* Fading Sniffles image */
 .fade-in {
     opacity: 0;
-    transition: transform 3s ease-in-out, opacity 2s ease-in-out;
-    transform: translateY(-50%)
+    transition: opacity 1s ease-in-out;
   }
   
   .fade-in-active {
@@ -40,9 +39,9 @@
   
   /* Slide-in from left for h2 */
   .slide-from-left {
-    transform: translateX(-70%);
+    transform: translateX(-30%);
     opacity: 0;
-    transition: transform 2s ease-out, opacity 3s ease-out;
+    transition: transform 1.5s ease-out, opacity 2.5s ease-out;
   }
   
   .slide-from-left-active {
@@ -52,9 +51,9 @@
   
   /* Slide-in from right for h6 */
   .slide-from-right {
-    transform: translateX(70%);
+    transform: translateX(30%);
     opacity: 0;
-    transition: transform 2.5s ease-out, opacity 3.5s ease-out;
+    transition: transform 2.0s ease-out, opacity 3.0s ease-out;
   }
   
   .slide-from-right-active {
