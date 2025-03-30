@@ -12,7 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from .models import LocationHistory, RelevantLocation, Disease, NotificationV2
 import django.utils.timezone as timezone
-from .forms import PhysicalReportForm2, AirborneReportForm2, ProfileForm
+from .forms import PhysicalReportForm2, AirborneReportForm3, ProfileForm
 from allauth.socialaccount.models import SocialAccount
 import requests
 from django.conf import settings
@@ -258,7 +258,7 @@ def report_airborne_illness(request):
         return render(request, "login.html")
 
     if request.method == 'POST':
-        form = AirborneReportForm2(request.POST)
+        form = AirborneReportForm3(request.POST)
         if form.is_valid():
             report = form.save()
 
@@ -288,18 +288,19 @@ def report_airborne_illness(request):
                     if distance <= radius_threshold:
                         potential_infected.add(entry.user)
 
-            print(f"Potential infected users: {len(potential_infected)}")
-            # for person in potential_infected:
-            #     NotificationV2.objects.create(
-            #         user=person.user,  
-            #         disease=report.illness, 
-            #         message=f"Exposure alert: You may have been exposed to {report.illness}.",
-            #     )
+            print(f"Potential infected users: {potential_infected}")
+            for person in potential_infected:
+                NotificationV2.objects.create(
+                    user=person,  
+                    disease=report.disease, 
+                    message=f"Exposure alert: You may have been exposed to {report.disease}.",
+                    created_at=timezone.now()
+                )
 
             return render(request, 'index.html', {'message': 'successful airborne form!'})
 
     else:
-        form = AirborneReportForm2()
+        form = AirborneReportForm3()
 
     return render(request, "report_airborne.html", {"form": form})
 
