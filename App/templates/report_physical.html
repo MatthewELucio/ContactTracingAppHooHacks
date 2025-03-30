@@ -4,11 +4,52 @@
 
 <h1>Report physical illness</h1>
 
+<!-- names_template.html -->
 <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
 
-    <button type="submit">Submit</button>
-</form>
+    <div id="names-container">
+      <div class="name-row">
+        <label>First Name: <input type="text" name="first_name[]" /></label>
+        <label>Last Name: <input type="text" name="last_name[]" /></label>
+      </div>
+    </div>
+    <button type="button" id="add-name">Add Name</button>
+    <input type="submit" value="Submit">
+  </form>
+  
+  <script>
+  // When the "Add Name" button is clicked, create another set of inputs
+  document.getElementById("add-name").addEventListener("click", function() {
+      // Create a new container div for the extra inputs
+      var newRow = document.createElement("div");
+      newRow.classList.add("name-row");
+      
+      // Create input for first name
+      var firstNameLabel = document.createElement("label");
+      firstNameLabel.innerText = "First Name: ";
+      var firstNameInput = document.createElement("input");
+      firstNameInput.type = "text";
+      firstNameInput.name = "first_name[]";
+      firstNameLabel.appendChild(firstNameInput);
+      
+      // Create input for last name
+      var lastNameLabel = document.createElement("label");
+      lastNameLabel.innerText = "Last Name: ";
+      var lastNameInput = document.createElement("input");
+      lastNameInput.type = "text";
+      lastNameInput.name = "last_name[]";
+      lastNameLabel.appendChild(lastNameInput);
+      
+      // Append inputs to the new row
+      newRow.appendChild(firstNameLabel);
+      newRow.appendChild(lastNameLabel);
+      
+      // Append the new row to the container
+      document.getElementById("names-container").appendChild(newRow);
+  });
+  </script>
+  
 
 {% endblock %}
