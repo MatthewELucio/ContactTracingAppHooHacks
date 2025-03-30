@@ -364,7 +364,7 @@ def diagnose(request):
     # context['results'] = ...  (if you want to keep condition search results)
 
     if request.method == "POST":
-        diseases = Disease.objects.all()
+        diseases = Disease.objects.filter(disease_type=Disease.AIR)
         # Build a comma-separated string of valid disease names.
         valid_diseases = ", ".join([d.name for d in diseases])
         symptoms = request.POST.get("symptoms", "").strip()
