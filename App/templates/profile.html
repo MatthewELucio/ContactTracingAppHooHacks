@@ -1,5 +1,27 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-<p>You are at PROFILE</p>
+
+<h3>Hello, {{user.username}}.</h3>
+
+<form method="POST">
+    {% csrf_token %}
+    <p class="pt-2">
+        First name: <input type="text" name="first_name" value="{{ user.first_name }}">
+    </p class="pt-1">
+    <p>
+        Last name: <input type="text" name="last_name" value="{{ user.last_name }}">
+    </p>
+    <p class="pt-1">
+        Email: <input type="email" name="email" value="{{ user.email }}">
+    </p>
+    <button class="btn btn-primary m-2" type="submit">Save</button>
+</form>
+
+{% if msg == 'complete' %}
+
+    <p><i>Saved succesfully!</i></p>
+
+{% endif %}
+
 {% endblock %}

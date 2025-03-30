@@ -26,7 +26,6 @@ urlpatterns = [
     path('update-location/', views.update_location, name='update_location'),
     path("login/", views.login, name='login'),
     path("logout/", views.logout_view, name='logout'),
-    path("settings/", views.settings, name='settings'),
     path("help/", views.help, name='help'),
     path("profile/", views.profile, name='profile'),
     path("home/", views.home, name='home'),
