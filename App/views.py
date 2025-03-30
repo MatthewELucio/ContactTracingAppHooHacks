@@ -21,7 +21,9 @@ from openai import OpenAI
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
 import os
-
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+import smtplib
 
 def haversine(lat1, lon1, lat2, lon2):
     """Calculate the great circle distance in meters between two points on Earth."""
@@ -210,6 +212,25 @@ def index(request):
         return render(request, "index.html", {'Notifications':notifications})
     else: return render(request, "login.html")
     
+def send(dest, disease):
+    smtp_user = 'matthewelucio@gmail.com'
+    smtp_password = os.environ.get('EMAIL_PASSWORD')
+    server = 'smtp.gmail.com'
+    port = 587
+
+    msg = MIMEMultipart("alternative")
+    msg["Subject"] = 'Important HoosSick Notification'
+    msg["From"] = smtp_user
+    msg["To"] = dest
+    msg.attach(MIMEText(f'\nYou may have been exposed to {disease}', 'plain'))
+
+    s = smtplib.SMTP(server, port)
+    s.ehlo()
+    s.starttls()
+    s.login(smtp_user, smtp_password)
+    s.sendmail(smtp_user, dest, msg.as_string())
+    s.quit()
+    
 def report_physical_illness(request):
     if not request.user.is_authenticated:
         return render(request, "login.html")
@@ -239,6 +260,7 @@ def report_physical_illness(request):
                             created_at=timezone.now()
                         )
                         notif.save()
+                        send(account.user.email, disease)
                             
         form = PhysicalReportForm2(request.POST)
         if form.is_valid():
@@ -272,7 +294,6 @@ def report_airborne_illness(request):
                 end_time__gt=infection_start
             ).exclude(user=request.user)
 
-            print(f"Found {overlapping_locations.count()} overlapping location entries.")
             user_locations = RelevantLocation.objects.filter(
                 user=request.user, start_time__lt=infection_end, end_time__gt=infection_start
             )
@@ -280,12 +301,10 @@ def report_airborne_illness(request):
             for loc in user_locations:
                 for entry in overlapping_locations:
                     distance = haversine(loc.latitude, loc.longitude, entry.latitude, entry.longitude)
-                    print(f"Checking {entry.user.username} at ({entry.latitude}, {entry.longitude}) - Distance: {distance}m")
 
                     if distance <= radius_threshold:
                         potential_infected.add(entry.user)
 
-            print(f"Potential infected users: {potential_infected}")
             for person in potential_infected:
                 NotificationV2.objects.create(
                     user=person,  
@@ -294,6 +313,7 @@ def report_airborne_illness(request):
                     message=f"Exposure alert: You may have been exposed to {report.disease}.",
                     created_at=timezone.now()
                 )
+                send(person.email, report.disease.name)  # Send email notification
 
             return render(request, 'index.html', {'message': 'successful airborne form!'})
 
@@ -462,6 +482,8 @@ def diagnose(request):
                         message=f"Exposure alert: You have been exposed to {diagnosis}.",
                         created_at=timezone.now()
                     )
+                    send(user.email, disease_instance.name)  # Send email notification
+
         # Optionally, handle the case where no matching Disease is found.
         context["message"] = f"Diagnosis complete. Notifications sent to {len(potential_infected)} users."
         
