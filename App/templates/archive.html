@@ -2,6 +2,34 @@
 {% load static %}
 {% block content %}
 
-
-
+<div class="container mt-5 content-box p-4 border rounded">
+    {% if Notifications %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Disease</th>
+                    <th scope="col">Notes</th>
+                    <th scope="col">Expand</th>
+                </tr>
+            </thead>
+            {% for notification in Notifications %}
+                <tr>
+                    <td> {{ notification.created_at }}</td>
+                    <td> {{ notification.disease }}</td>
+                    <td> {{ notification.message }}</td>
+                    <td>
+                        <a class="btn btn-outline-primary" href="{% url 'App:view_notification' notification_number=notification.pk %}">View</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <div class = "p-4 alert-primary d-flex justify-content-center">
+            <tr>
+                <td>No notifications at the moment.</td>
+            </tr>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}
