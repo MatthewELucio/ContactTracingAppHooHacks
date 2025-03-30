@@ -2,29 +2,44 @@
 {% load static %}
 {% block content %}
 
-<table class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Disease Type</th>
-            <th>View more (external)</th>
-        </tr>
-    </thead>
-    <tbody class="p-3">
-        {% for disease in Diseases %}
-            <tr>
-                <td>{{ disease.name }}</td>
-                <td>{{ disease.disease_type }}</td>
-                <td>
-                    <a class="btn btn-outline-secondary" href="{{ disease.learn_link }}">View</a>
-                </td>
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="3"><strong>Disease data failed to load.</strong></td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-7">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Disease Type</th>
+                        <th>View more (external)</th>
+                    </tr>
+                </thead>
+                <tbody class="p-3">
+                    {% for disease in Diseases %}
+                        <tr>
+                            <td>{{ disease.name }}</td>
+                            <td>{{ disease.disease_type }}</td>
+                            <td>
+                                <a class="btn btn-outline-secondary" href="{{ disease.learn_link }}">View</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3"><strong>Disease data failed to load.</strong></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-md-5">
+            <div class="card p-3">
+                <div class="card-header border-rounded">
+                    <h2>Report symptoms</h2>
+                </div>
+                <p class="pt-3">Got any symptoms dragging you down? Let us know and we'll give recommendations on what it may be and how to help!</p>
+                <div style="height:100px"></div>
+            </div>
+        </div>
+        </div>
+    </div>
 
 {% endblock %}
