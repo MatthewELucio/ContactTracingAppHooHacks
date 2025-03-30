@@ -16,8 +16,7 @@ from django.views.decorators.http import require_GET
 from openai import OpenAI
 from django.conf import settings
 from django.views.decorators.http import require_http_methods
-
-
+import os
 
 def haversine(lat1, lon1, lat2, lon2):
     """Calculate the great circle distance in meters between two points on Earth."""
@@ -215,10 +214,7 @@ def diagnose(request):
             f"{symptoms}"
         )
 
-        # Set the API key from settings.
-        openai_api_key = settings.OPENAI_API_KEY
-        client = OpenAI(api_key='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')
-
+        client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
         try:
             response = client.chat.completions.create(model="gpt-4o-mini",
