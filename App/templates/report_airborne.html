@@ -1,14 +1,18 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+<div class="mx-auto pt-4 col-md-6">
+    <div class="card p-2">
+        <div class="card-header">
+            <h1>Report airborne illness</h1>
+        </div>
 
-<h1>Report airborne illness</h1>
+        <form class ="pt-3" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-
-    <button type="submit">Submit</button>
-</form>
-
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</div>
 {% endblock %}
