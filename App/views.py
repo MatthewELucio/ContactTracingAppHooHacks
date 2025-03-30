@@ -7,9 +7,9 @@ import math
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-from .models import LocationHistory, RelevantLocation, Disease
+from .models import LocationHistory, RelevantLocation, Disease, NotificationV2
 import django.utils.timezone as timezone
-from .forms import PhysicalReportForm2, AirborneReportForm
+from .forms import PhysicalReportForm2, AirborneReportForm, ProfileForm
 from allauth.socialaccount.models import SocialAccount
 
 
@@ -127,8 +127,6 @@ def report_physical_illness(request):
         last_names = request.POST.getlist("last_name[]")
         
         google_accounts = SocialAccount.objects.filter(provider='google')
-        for account in google_accounts:
-            print(account.user.first_name, account.user.last_name, account.user.email)
         
         names = []
         for first, last in zip(first_names, last_names):
@@ -137,7 +135,14 @@ def report_physical_illness(request):
                 for account in google_accounts:
                     if account.user.first_name.lower() == first.strip().lower() and account.user.last_name.lower() == last.strip().lower():
                         # Perform the necessary action with the matched user
-                        print(f"Matched user: {account.user.email}")
+                        disease_instance = Disease.objects.filter(name=disease).first()
+                        notif = NotificationV2.objects.create(
+                            user=account.user,
+                            disease=disease_instance,
+                            message=f"You have been exposed to {disease}",
+                            created_at=timezone.now()
+                        )
+                        notif.save()
                             
         form = PhysicalReportForm2(request.POST)
         if form.is_valid():
@@ -147,31 +152,6 @@ def report_physical_illness(request):
         form = PhysicalReportForm2()
 
     return render(request, 'report_physical.html', {'form': form})
-
-# def names_view(request):
-#     if request.method == "POST":
-#         # Retrieve lists of names from the request data
-#         first_names = request.POST.getlist("first_name[]")
-#         last_names = request.POST.getlist("last_name[]")
-        
-#         # Combine them into a list of dictionaries (or process as needed)
-#         google_accounts = SocialAccount.objects.filter(provider='google')
-#         print(google_accounts)
-#         names = []
-#         for first, last in zip(first_names, last_names):
-#             if first.strip() or last.strip():
-#                 names.append({"first_name": first, "last_name": last})
-#                 for account in google_accounts:
-#                     if account.user.first_name == first and account.user.last_name == last:
-#                         # Perform the necessary action with the matched user
-#                         print(f"Matched user: {account.user.email}")
-        
-#         # Debug or process further (e.g., save to a model)
-#         print("Names received:", names)
-#         return redirect("success")  # Or render a response
-
-    # For GET requests, render the form template
-    return render(request, "names_template.html")
 
 def report_airborne_illness(request):
     if not request.user.is_authenticated:
