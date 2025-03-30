@@ -238,7 +238,7 @@ def report_physical_illness(request):
                         notif = NotificationV2.objects.create(
                             user=account.user,
                             disease=disease_instance,
-                            notif_strength="high",  # Assuming this is the type for exposure notifications
+                            notif_strength=NotificationV2.HIGH,  # Assuming this is the type for exposure notifications
                             message=f"You have been exposed to {disease}",
                             created_at=timezone.now()
                         )
@@ -293,7 +293,8 @@ def report_airborne_illness(request):
             for person in potential_infected:
                 NotificationV2.objects.create(
                     user=person,  
-                    disease=report.disease, 
+                    disease=report.disease,
+                    notif_strength=NotificationV2.MEDIUM, 
                     message=f"Exposure alert: You may have been exposed to {report.disease}.",
                     created_at=timezone.now()
                 )
@@ -447,6 +448,7 @@ def diagnose(request):
                     NotificationV2.objects.create(
                         user=user,
                         disease=disease_instance,
+                        notif_strength=NotificationV2.LOW,
                         message=f"Exposure alert: You have been exposed to {diagnosis}.",
                         created_at=timezone.now()
                     )
