@@ -246,6 +246,7 @@ def report_physical_illness(request):
         form = PhysicalReportForm2(request.POST)
         if form.is_valid():
             form.save()
+            return redirect('App:index')  # Redirect to the index page after saving the form
             return render(request, 'index.html', {'message': 'successful physical form'})
     else:
         form = PhysicalReportForm2()
