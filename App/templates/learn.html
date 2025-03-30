@@ -5,7 +5,7 @@
 <div class="container mt-5">
   <div class="row">
     <!-- Left column: Disease Table -->
-    <div class="col-md-7">
+    <div class="col-md-6 border rounded pt-2 mx-4">
       <table class="table table-bordered">
         <thead>
           <tr>
@@ -38,15 +38,15 @@
       <!-- Diagnosis Card -->
       <div class="card p-3">
         <div class="card-header border-rounded">
-          <h2>Get Diagnosis</h2>
+          <h2>Investigate Symptoms</h2>
         </div>
         <form method="post" action="{% url 'App:diagnose' %}">
           {% csrf_token %}
-          <div class="mb-3">
-            <label for="symptoms" class="form-label">Enter your symptoms:</label>
+          <div class="mb-4">
+            <label for="symptoms" class="pt-3 pb-3 form-label">Feeling under the weather? Enter your symptoms below and we'll evaluate a possible cause:</label>
             <textarea id="symptoms" name="symptoms" class="form-control" rows="3" placeholder="e.g., fever, cough, headache"></textarea>
           </div>
-          <button type="submit" class="btn btn-primary">Get Diagnosis</button>
+          <button type="submit" class="btn btn-primary">Get results</button>
         </form>
         {% if diagnosis %}
           <div class="mt-3">

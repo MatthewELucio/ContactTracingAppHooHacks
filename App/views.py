@@ -209,7 +209,7 @@ def view_notification(request):
 
 def index(request):
     if request.user.is_authenticated:
-        notifications = None #update once we have data structure in models
+        notifications = NotificationV2.objects.filter(user=request.user).order_by('-created_at')
         return render(request, "index.html", {'Notifications':notifications})
     else: return render(request, "login.html")
     
