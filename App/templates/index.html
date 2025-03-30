@@ -25,8 +25,8 @@
                         {% for notification in Notifications %}
                             {% if not notification.archived %}
                                 <tr>
-                                    <td> {{ notification.created_at }}</td>
                                     <td> {{ notification.disease }}</td>
+                                    <td> {{ notification.created_at }}</td>
                                     <td> {{ notification.message }}</td>
                                     <td>
                                         <button class="btn btn-outline-primary""><a href="{% url 'App:archive_notif' notif=notification.id %}">Archive</a></button>
