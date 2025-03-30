@@ -129,3 +129,27 @@ class ReportPerson(models.Model):
     report = models.ForeignKey(PhysicalReport, on_delete=models.CASCADE, related_name='persons')
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
+    def __str__(self):
+        return self.name
+    
+class Notification(models.Model):
+    # This model is used to notify users about potential exposures.
+
+    # receiving user for the notification
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='notifications'
+    )
+    disease = models.ForeignKey(
+        Disease,
+        on_delete=models.CASCADE,
+        related_name='notifications',
+        help_text="The disease associated with this notification"
+    )
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    read = models.BooleanField(default=False)  # Indicates whether the notification has been read by the user
+
+    def __str__(self):
+        return f"Notification for {self.user.username} at {self.created_at} - Read: {self.read}"
