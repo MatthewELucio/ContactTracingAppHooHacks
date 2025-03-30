@@ -3,8 +3,8 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import logout
 from django.contrib.auth.models import Group
-import math, datetime, json, folium, os
-from folium.plugins import HeatMap, TimestampedGeoJson
+import math, random, datetime, json, folium, os
+from folium.plugins import TimestampedGeoJson
 from datetime import datetime
 from django.conf import settings
 from django.http import JsonResponse
@@ -47,41 +47,52 @@ def generate_exposure_map(user_locations, radius=50, save_path=None):
     if not user_locations:
         print("No user locations provided.")
         return None
-    
+
     print(f"Generating map for {len(user_locations)} locations...")
 
     first_location = user_locations[0]
     map_center = (first_location[1], first_location[2])
 
-    # Initialize the map
     exposure_map = folium.Map(location=map_center, zoom_start=15, control_scale=True)
 
+    colors = ["red", "blue", "green", "orange", "purple", "brown", "pink", "gray"]
+    user_colors = {}
+
+    features = []
     for username, lat, lon, timestamp in user_locations:
-        popup_text = f"{username} - {timestamp.strftime('%Y-%m-%d %H:%M:%S')}"
-        # print(f"Adding circle for {username} at ({lat}, {lon})")
+        if username not in user_colors:
+            user_colors[username] = random.choice(colors)
 
-        folium.Circle(
-            location=(lat, lon),
-            radius=radius,
-            color="red",
-            fill=True,
-            fill_color="red",
-            fill_opacity=0.3,
-            popup=popup_text
-        ).add_to(exposure_map)
+        color = user_colors[username]
+        # popup_text = f"{username} - {timestamp.strftime('%Y-%m-%d %H:%M:%S')}"
+        
+        feature = {
+            "type": "Feature",
+            "geometry": {
+                "type": "Point",
+                "coordinates": [lon, lat],
+            },
+            "properties": {
+                "time": timestamp.isoformat(),
+                "style": {"color": color},
+                "icon": "circle",
+                # "popup": popup_text
+            },
+        }
+        features.append(feature)
 
-        folium.Marker(
-            location=(lat, lon),
-            popup=popup_text,
-            icon=folium.Icon(color="blue", icon="info-sign")
-        ).add_to(exposure_map)
+    TimestampedGeoJson(
+        {"type": "FeatureCollection", "features": features},
+        period="PT5M",
+        add_last_point=True,
+        auto_play=True,
+        loop=True,
+        max_speed=1,
+        loop_button=True,
+        date_options="YYYY-MM-DD HH:mm:ss",
+        time_slider_drag_update=True,
+    ).add_to(exposure_map)
 
-    # Add a heatmap layer for better visualization
-    heatmap_data = [(lat, lon) for _, lat, lon, _ in user_locations]
-
-    HeatMap(heatmap_data, radius=30).add_to(exposure_map)
-
-    # Save map to file if path is provided
     if save_path:
         exposure_map.save(save_path)
 
