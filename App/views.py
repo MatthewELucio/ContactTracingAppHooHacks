@@ -9,7 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from .models import LocationHistory, RelevantLocation, Disease
 import django.utils.timezone as timezone
-from .forms import PhysicalReportForm
+from .forms import PhysicalReportForm, ProfileForm
 
 
 def haversine(lat1, lon1, lat2, lon2):
@@ -163,13 +163,16 @@ def help(request):
 
 
 def profile(request):
-    if request.user.is_authenticated:
-        return render(request, "profile.html")
-    else: return render(request, "login.html")
+    user = request.user  # Get the current user
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()  # Save the updated user data
+            return render(request, 'profile.html', {'msg': 'complete'})  # Redirect to the same page after successful save
+    else:
+        form = ProfileForm(instance=user)
 
-def settings(request):
-    if request.user.is_authenticated:
-        return render(request, "settings.html")
+    return render(request, 'profile.html', {'form': form})
 
 @login_required
 def home(request):
