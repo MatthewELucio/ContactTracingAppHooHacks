@@ -50,6 +50,20 @@ class NotificationV2(models.Model):
         related_name='notifications',
         help_text="The disease associated with this notification"
     )
+    HIGH = 'high'
+    MEDIUM = 'medium'
+    LOW = 'low'
+    NOTIF_STRENGTH_CHOICES = [
+        (LOW, 'Low'),
+        (MEDIUM, 'Medium'),
+        (HIGH, 'High')
+    ]
+    notif_strength = models.CharField(
+        max_length=20,
+        choices=NOTIF_STRENGTH_CHOICES,
+        default='medium',
+        help_text="Type of disease (air or physical)"
+    )
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     read = models.BooleanField(default=False)
@@ -144,4 +158,4 @@ class AirborneReport3(models.Model):
     was_diagnosed = models.BooleanField(default=False)  # Checkbox
 
     def __str__(self):
-        return self.symptoms
+        return self.disease.name

@@ -9,7 +9,7 @@ User = get_user_model()
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email']
+        fields = ['email']
 
 
 class PhysicalReportForm2(forms.ModelForm):
