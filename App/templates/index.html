@@ -11,22 +11,30 @@
             <div class="content-box p-4 border rounded">
                 <h2>Notifications</h2>
                 <p>View any notifications regarding transmission below:</p>
-                <tbody class="p-3">
+                <table class="p-3 table table-bordered">
                     {% if Notifications %}
                         <p>Notifications:</p>
+                        <thead>
+                            <tr>
+                                <th scope="col">Date</th>
+                                <th scope="col">Disease</th>
+                                <th scope="col">Notes</th>
+                                <th scope="col">View</th>
+                                <th scope="col">Archive</th>
+                            </tr>
+                        </thead>
                         {% for notification in Notifications %}
                             {% if not notification.archived %}
                                 <tr>
                                     <td> {{ notification.created_at }}</td>
                                     <td> {{ notification.disease }}</td>
                                     <td> {{ notification.message }}</td>
-                                    <td> {{ notification.read }}</td>
-                                    {% comment %} <td>
-                                        <a class="btn btn-outline-primary" href="{% url 'App:view_notification' notification_number=notification.pk %}">View</a>
+                                     <td>
+                                        <button class="btn btn-outline-primary" href="#">View</button>
                                     </td>
                                     <td>
-                                        <a class="btn btn-outline-primary" href="{% url 'App:archive_notification' notification_number=notification.pk %}">Archive</a>
-                                    </td> {% endcomment %}
+                                        <button class="btn btn-outline-primary" href="#">Archive</button>
+                                    </td>
                                 </tr>
                             {% endif %}
                         {% endfor %}
@@ -37,7 +45,7 @@
                         </tr>
                     </div>
                     {% endif %}
-                </tbody>
+                </table>
             </div>
         </div>
 

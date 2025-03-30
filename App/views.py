@@ -325,7 +325,7 @@ def help(request):
 
 def archive(request):
     if request.user.is_authenticated:
-        notifications = None
+        notifications = NotificationV2.objects.filter(user=request.user).order_by('-created_at')
         return render(request, "archive.html", {'Notifications': notifications}) 
     else: return render(request, "login.html")
 
